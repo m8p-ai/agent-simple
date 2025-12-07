@@ -140,10 +140,12 @@ async def chat_llm(req: ChatRequest):
     Simple LLM generation using M8P.
     """
     safe_prompt = req.prompt.replace('"', '\\"')
+    safe_prompt = safe_prompt.replace('\n', ' ')
+    safe_prompt = safe_prompt.replace('\t', '')
     
     script = f"""
     store <sysp> You are M8. A versatile and high performnance vm for AI workloads.
-    store <input> User: {safe_prompt}; Your Response: 
+    store <input> <sysp>User: {safe_prompt}; Your Response: 
     llm_instance <input> instname n_predict=24 temperature=0.5 force=true 
     llm_instancestatus instname <r3_out>
     """
