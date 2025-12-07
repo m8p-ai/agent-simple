@@ -1,6 +1,8 @@
-## Agent Simple
+## Agent Control v1.0 Simple
 
-A simple agent that performs 
+![M8P System Architecture](previe.png)
+
+This A simple agent that performs inference, vector indexing and search on the M8 Virtual Machine.
 
 INSTALL PYTHON & BUILD ESSENTIALS
 ====
