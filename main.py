@@ -62,6 +62,7 @@ async def index_document(req: IndexRequest):
     script = f"""
     store <doc_text> "{safe_content}"
     llm_embed <doc_text> <embedding> dim={EMBED_DIM}
+    align <embedding> {EMBED_DIM}
     vdb_add {VECTOR_DB_NAME} <embedding>
     return "Indexed"
     """
@@ -85,8 +86,9 @@ async def search_memory(req: SearchRequest):
     safe_query = req.query.replace('"', '\\"')
     
     script = f"""
-    store <query_text> "{safe_query}"
+    store <query_text> {safe_query}
     llm_embed <query_text> <q_vec> dim={EMBED_DIM}
+    align <q_vec> {EMBED_DIM}
     vdb_search {VECTOR_DB_NAME} <q_vec> <matches> distance=0.1
     return <matches>
     """
@@ -114,8 +116,8 @@ async def chat_llm(req: ChatRequest):
     safe_prompt = req.prompt.replace('"', '\\"')
     
     script = f"""
-    store <input> "{safe_prompt}"
-    llm_instance <intput> instname n_predict=24 temperature=0.5 force=true 
+    store <input> {safe_prompt}
+    llm_instance <input> instname n_predict=24 temperature=0.5 force=true 
     llm_instancestatus instname <r3_out>
     """
     
