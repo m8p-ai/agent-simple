@@ -88,7 +88,7 @@ async def search_memory(req: SearchRequest):
     store <query_text> {safe_query}
     llm_embed <query_text> <q_vec> dim={EMBED_DIM}
     vdb_search {VECTOR_DB_NAME} <q_vec> <matches> distance=0.1
-    llm_detokenize <q_vec> <result> 
+    llm_detokenize <matches> <result> 
     return <result>
     """
     
