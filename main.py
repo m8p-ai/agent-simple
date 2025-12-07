@@ -90,7 +90,8 @@ async def search_memory(req: SearchRequest):
     llm_embed <query_text> <q_vec> dim={EMBED_DIM}
     align <q_vec> {EMBED_DIM}
     vdb_search {VECTOR_DB_NAME} <q_vec> <matches> distance=0.1
-    return <matches>
+    llm_detokenize <q_vec> <result> 
+    return <result>
     """
     
     resp = M8.RunSession(AGENT_SESSION_ID, script, timeout=5)
