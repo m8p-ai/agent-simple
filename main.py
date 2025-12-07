@@ -16,6 +16,8 @@ VECTOR_DB_NAME = "AGENT_MEMORY"
 EMBED_DIM = 188 # Adjust based on your model (e.g. 768 for Nomic, 4096 for Llama3/Mistral usually)
 MAX_ELEMENTS = 1000
 
+print("AGENT_SESSION_ID: ", AGENT_SESSION_ID)
+
 # --- Pydantic Models ---
 class IndexRequest(BaseModel):
     content: str
