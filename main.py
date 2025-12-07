@@ -1,6 +1,7 @@
 from fastapi import FastAPI, HTTPException, BackgroundTasks
 from pydantic import BaseModel
 from m8_client import M8
+from typing import Any
 import uuid
 
 app = FastAPI(title="M8P Vector Agent", description="High-performance agent using M8P Hypervisor")
@@ -26,10 +27,8 @@ class ChatRequest(BaseModel):
 
 class CommandResponse(BaseModel):
     status: str
-    result: any = None
-    telemetry: any = None
-
-from typing import any
+    result: Any = None
+    telemetry: Any = None
 
 # --- Helper to Initialize Session ---
 def init_agent_memory():
