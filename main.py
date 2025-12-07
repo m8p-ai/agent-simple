@@ -62,13 +62,14 @@ async def read_root():
     """
     Serves the agent_frontend.html file directly at the root URL.
     """
-    if os.path.exists("agent_frontend.html"):
-        with open("agent_frontend.html", "r") as f:
+    if os.path.exists("app/index.html"):
+        with open("app/index.html", "r") as f:
             return f.read()
+
     return """
     <html>
         <body style="background:#000; color: #0f0; font-family: monospace; display: flex; justify-content: center; align-items: center; height: 100vh;">
-            <h1>Error: agent_frontend.html not found in working directory</h1>
+            <h1>Error: APP NOT FOUND</h1>
         </body>
     </html>
     """
