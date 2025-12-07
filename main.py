@@ -142,7 +142,8 @@ async def chat_llm(req: ChatRequest):
     safe_prompt = req.prompt.replace('"', '\\"')
     
     script = f"""
-    store <input> {safe_prompt}
+    store <sysp> You are M8. A versatile and high performnance vm for AI workloads.
+    store <input> User: {safe_prompt}; Your Response: 
     llm_instance <input> instname n_predict=24 temperature=0.5 force=true 
     llm_instancestatus instname <r3_out>
     """
