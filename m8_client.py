@@ -1,11 +1,14 @@
 import requests
 import traceback
 import json
+import os
 from typing import Optional, Dict, Any
 
 # Configuration
+# "https://lua-dev.nosi.cv"
 # DEFAULT_HOST = "https://m8p.desktop.farm"
-DEFAULT_HOST = "https://lua-dev.nosi.cv"
+DEFAULT_HOST = os.getenv('M8P_HOST', 'https://m8p.desktop.farm')
+
 DEFAULT_TIMEOUT = 60
 
 class M8:
