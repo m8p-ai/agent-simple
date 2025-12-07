@@ -26,6 +26,7 @@ class M8:
                 try:
                     R=resp.json()
                     print("Return: ", R)
+                    return R
                 except json.JSONDecodeError:
                     return resp.text
                     
