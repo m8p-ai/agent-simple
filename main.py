@@ -59,7 +59,7 @@ async def startup_event():
     init_agent_memory()
 
 @app.get("/", response_class=HTMLResponse)
-async def read_root(pagename):
+async def read_root():
     """
     Serves the agent_frontend.html file directly at the root URL.
     """
