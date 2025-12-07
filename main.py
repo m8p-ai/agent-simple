@@ -172,20 +172,14 @@ async def stream_chat_llm(req: ChatRequest):
     llm_instancestatus instname2 <r3_out>
     # stream Response 2 IS DONE.
 
-    # store <r3_out> PreviousAnswer: <r3_out> Continue:
+    store <r3_out> PreviousAnswer: <r3_out> Continue:
     llm_instance <r3_out> instname3 n_predict=45 temperature=0.1 force=true stream=true
     # stream Response 3 IS DONE.
 
-    # store <r3_out> PreviousAnswer: <r3_out> Continue:
+    store <r3_out> PreviousAnswer: <r3_out> Continue:
     llm_instance <r3_out> instname3 n_predict=45 temperature=0.1 force=true stream=true
     # stream Response 4 IS DONE.
 
-    # store <r3_out> PreviousAnswer: <r3_out> Continue:
-    llm_instance <r3_out> instname4 n_predict=45 temperature=0.1 force=true stream=true
-    # stream Response 4 IS DONE.
-
-    llm_instance <r3_out> instname5 n_predict=45 temperature=0.1 force=true stream=true
-    # stream Response 4 IS DONE.
     """
     return StreamingResponse(
         M8.StreamSession(AGENT_SESSION_ID, script),
