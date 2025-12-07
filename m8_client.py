@@ -24,7 +24,8 @@ class M8:
                 resp = requests.post(url, json=payload, headers=headers, timeout=timeout)
                 # Attempt to parse JSON, fall back to text if response isn't JSON
                 try:
-                    return resp.json()
+                    R=resp.json()
+                    print("Return: ", R)
                 except json.JSONDecodeError:
                     return resp.text
                     
