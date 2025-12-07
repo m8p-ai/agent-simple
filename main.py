@@ -8,7 +8,7 @@ import uuid
 app = FastAPI(title="M8P Vector Agent", description="High-performance agent using M8P Hypervisor")
 
 # --- Constants ---
-AGENT_SESSION_ID = "M8_AGENT_MAINx_V1"
+AGENT_SESSION_ID = "M8_AGENT_MAINx_Vx"
 VECTOR_DB_NAME = "AGENT_MEMORY"
 EMBED_DIM = 768 # Adjust based on your model (e.g. 768 for Nomic, 4096 for Llama3/Mistral usually)
 MAX_ELEMENTS = 1000
@@ -63,7 +63,7 @@ async def index_document(req: IndexRequest):
     store <doc_text> "{safe_content}"
     llm_embed <doc_text> <embedding> dim={EMBED_DIM}
     align <embedding> {EMBED_DIM}
-    vdb_add {VECTOR_DB_NAME} <embedding>
+    vdb_add {VECTOR_DB_NAME} <embedding> {safe_content}
     return "Indexed"
     """
     
