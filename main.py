@@ -168,16 +168,16 @@ async def stream_chat_llm(req: ChatRequest):
     # stream Response1 IS DONE.
 
     store <r3_out> Question: <q>; PreviousAnswer: <r3_out> YourAnswer:
-    llm_instance <r3_out> instname2 n_predict=15 temperature=0.5 force=true stream=true
+    llm_instance <r3_out> instname2 n_predict=55 temperature=0.5 force=true stream=true
     llm_instancestatus instname2 <r3_out>
     # stream Response 2 IS DONE.
 
     store <r3_out> Question: <q>; PreviousAnswer: <r3_out> YourAnswer:
-    llm_instance <r3_out> instname3 n_predict=25 temperature=0.8 force=true stream=true
+    llm_instance <r3_out> instname3 n_predict=45 temperature=0.8 force=true stream=true
     # stream Response 3 IS DONE.
 
     store <r3_out> Question: <q>; PreviousAnswer: <r3_out> YourAnswer:
-    llm_instance <r3_out> instname3 n_predict=25 temperature=0.8 force=true stream=true
+    llm_instance <r3_out> instname3 n_predict=45 temperature=0.8 force=true stream=true
     # stream Response 4 IS DONE.
     """
     return StreamingResponse(
