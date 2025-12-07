@@ -60,9 +60,8 @@ async def index_document(req: IndexRequest):
     safe_content = req.content.replace('"', '\\"')
     
     script = f"""
-    store <doc_text> "{safe_content}"
+    store <doc_text> {safe_content}
     llm_embed <doc_text> <embedding> dim={EMBED_DIM}
-    align <embedding> {EMBED_DIM}
     vdb_add {VECTOR_DB_NAME} <embedding> {safe_content}
     store <rr> "Indexed"
     """
@@ -88,7 +87,6 @@ async def search_memory(req: SearchRequest):
     script = f"""
     store <query_text> {safe_query}
     llm_embed <query_text> <q_vec> dim={EMBED_DIM}
-    align <q_vec> {EMBED_DIM}
     vdb_search {VECTOR_DB_NAME} <q_vec> <matches> distance=0.1
     llm_detokenize <q_vec> <result> 
     return <result>
