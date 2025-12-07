@@ -166,7 +166,11 @@ async def stream_chat_llm(req: ChatRequest):
     store <input> <sysp>User: {safe_prompt}; Your Response: 
 
     llm_instance <input> instname n_predict=24 temperature=0.1 force=true stream=true
-    llm_instance <r3_out> instname2 n_predict=25 temperature=0.5 force=true stream=true
+    llm_instancestatus instname <r3_out>
+
+    llm_instance <r3_out> instname2 n_predict=25 temperature=0.5 force=true
+    llm_instancestatus instname2 <r3_out>
+
     llm_instance <r3_out> instname3 n_predict=25 temperature=0.8 force=true stream=true
     """
     
