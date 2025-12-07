@@ -1,5 +1,6 @@
 from fastapi import FastAPI, HTTPException, BackgroundTasks
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import HTMLResponse
 from pydantic import BaseModel
 from m8_client import M8
 from typing import Any
@@ -8,7 +9,10 @@ from datetime import datetime
 
 tms = datetime.utcnow().strftime('%Y-%m-%dT%H:%M:%S')
 
-app = FastAPI(title="M8P Vector Agent", description="High-performance agent using M8P Hypervisor")
+app = FastAPI(
+    title="M8P Vector Agent", 
+    description="High-performance agent using M8P Hypervisor"
+)
 
 # --- Constants ---
 AGENT_SESSION_ID = "sess-"+tms
@@ -42,7 +46,7 @@ def init_agent_memory():
     Ensures the Vector DB instance exists in the session memory.
     """
     init_script = f"""
-    vdb_instance {VECTOR_DB_NAME} dim={EMBED_DIM} max_elements={MAX_ELEMENTS} M=24 ef_construction=200
+    vdb_instance {VECTOR_DB_NAME} dim={EMBED_DIM} max_elements={MAX_ELEMENTS} M=68 ef_construction=200
     store <r1> "Memory Initialized"
     """
     # EnsureExists calls session-check, creating it if missing
@@ -52,6 +56,22 @@ def init_agent_memory():
 async def startup_event():
     print(f"Booting Agent Session: [{AGENT_SESSION_ID}]")
     init_agent_memory()
+
+@app.get("/", response_class=HTMLResponse)
+async def read_root():
+    """
+    Serves the agent_frontend.html file directly at the root URL.
+    """
+    if os.path.exists("agent_frontend.html"):
+        with open("agent_frontend.html", "r") as f:
+            return f.read()
+    return """
+    <html>
+        <body style="background:#000; color: #0f0; font-family: monospace; display: flex; justify-content: center; align-items: center; height: 100vh;">
+            <h1>Error: agent_frontend.html not found in working directory</h1>
+        </body>
+    </html>
+    """
 
 # --- Endpoints ---
 

@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>M8P | Agent Command Console</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        mono: ['JetBrains Mono', 'monospace'],
+                    },
+                    colors: {
+                        m8: {
+                            bg: '#050505',
+                            surface: '#0A0A0C',
+                            border: '#1F1F23',
+                            primary: '#FF4D00', // Institutional Orange
+                            dim: '#71717A',
+                            text: '#E4E4E7'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body { background-color: #050505; color: #E4E4E7; }
+        .grid-bg {
+            background-size: 40px 40px;
+            background-image: linear-gradient(to right, rgba(31, 31, 35, 0.4) 1px, transparent 1px),
+                              linear-gradient(to bottom, rgba(31, 31, 35, 0.4) 1px, transparent 1px);
+        }
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: #0A0A0C; }
+        ::-webkit-scrollbar-thumb { background: #333; border-radius: 3px; }
+        ::-webkit-scrollbar-thumb:hover { background: #FF4D00; }
+        
+        .blink { animation: blinker 1s linear infinite; }
+        @keyframes blinker { 50% { opacity: 0; } }
+    </style>
+</head>
+<body class="h-screen flex flex-col font-sans overflow-hidden grid-bg selection:bg-m8-primary selection:text-white">
+
+    <!-- Header -->
+    <header class="h-14 border-b border-m8-border bg-[#050505]/95 backdrop-blur flex items-center justify-between px-6 shrink-0 z-50">
+        <div class="flex items-center gap-3">
+            <div class="w-6 h-6 bg-m8-primary flex items-center justify-center text-black font-bold font-mono text-xs">M8</div>
+            <span class="font-mono text-sm tracking-wide text-m8-dim">AGENT CONTROL <span class="text-m8-primary">v1.0</span></span>
+        </div>
+        <div class="flex items-center gap-4 text-[10px] font-mono">
+            <div class="flex items-center gap-2 text-m8-dim">
+                <span class="w-2 h-2 rounded-full bg-green-500 shadow-[0_0_5px_rgba(0,255,0,0.5)]"></span>
+                SYSTEM ONLINE
+            </div>
+            <div class="px-2 py-1 bg-m8-border rounded text-white" id="latency-meter">
+                LAST OP: -- ms
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Workspace -->
+    <div class="flex-1 flex overflow-hidden">
+        
+        <!-- Left Panel: Chat Interface -->
+        <div class="flex-1 flex flex-col border-r border-m8-border min-w-[300px]">
+            <!-- Chat History -->
+            <div id="chat-history" class="flex-1 overflow-y-auto p-6 space-y-6 scroll-smooth">
+                <!-- Welcome Message -->
+                <div class="flex gap-4 max-w-3xl">
+                    <div class="w-8 h-8 rounded-sm bg-m8-surface border border-m8-border flex items-center justify-center shrink-0 text-m8-primary text-xs font-mono">M8</div>
+                    <div>
+                        <div class="text-xs font-mono text-m8-dim mb-1">SYSTEM</div>
+                        <div class="text-sm leading-relaxed text-gray-300">
+                            M8P Agent initialized. Session attached. Ready for instructions.
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Input Area -->
+            <div class="p-4 bg-m8-surface border-t border-m8-border">
+                <div class="relative">
+                    <textarea id="chat-input" rows="1" 
+                        class="w-full bg-[#050505] border border-m8-border p-4 pr-12 text-sm focus:outline-none focus:border-m8-primary transition-colors font-mono resize-none text-white placeholder-gray-600"
+                        placeholder="Execute command or query..."></textarea>
+                    <button id="send-btn" onclick="sendChat()" 
+                        class="absolute right-2 bottom-2 p-2 text-m8-dim hover:text-m8-primary transition-colors">
+                        <i class="fas fa-paper-plane"></i>
+                    </button>
+                </div>
+                <div class="flex justify-between items-center mt-2 px-1">
+                    <div class="text-[10px] font-mono text-m8-dim">ENTER to send • SHIFT+ENTER for newline</div>
+                    <button onclick="resetSession()" class="text-[10px] font-mono text-red-500 hover:text-red-400 uppercase tracking-wider">
+                        <i class="fas fa-trash-alt mr-1"></i> Purge Memory
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Right Panel: Memory & Indexing -->
+        <div class="w-[400px] flex flex-col bg-m8-surface border-l border-m8-border shrink-0">
+            
+            <!-- Tabs -->
+            <div class="flex border-b border-m8-border">
+                <button class="flex-1 py-3 text-xs font-mono font-bold text-m8-primary border-b-2 border-m8-primary bg-[#050505]">VECTOR STORE</button>
+                <!-- <button class="flex-1 py-3 text-xs font-mono text-m8-dim hover:text-white transition-colors">LOGS</button> -->
+            </div>
+
+            <!-- Vector Store Controls -->
+            <div class="flex-1 overflow-y-auto p-6 space-y-8">
+                
+                <!-- Indexing Section -->
+                <div>
+                    <h3 class="text-xs font-mono text-white uppercase tracking-widest mb-4 flex items-center gap-2">
+                        <i class="fas fa-database text-m8-dim"></i> Ingest Data
+                    </h3>
+                    <div class="space-y-3">
+                        <textarea id="index-content" rows="4" 
+                            class="w-full bg-[#050505] border border-m8-border p-3 text-xs font-mono focus:border-m8-primary focus:outline-none text-gray-300"
+                            placeholder="Enter text to embed into vector memory..."></textarea>
+                        <button onclick="indexContent()" 
+                            class="w-full bg-m8-border hover:bg-m8-primary hover:text-black text-white text-xs font-mono py-2 transition-all border border-m8-border">
+                            INDEX VECTOR
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Semantic Search Section -->
+                <div class="pt-6 border-t border-m8-border">
+                    <h3 class="text-xs font-mono text-white uppercase tracking-widest mb-4 flex items-center gap-2">
+                        <i class="fas fa-search text-m8-dim"></i> Memory Debug
+                    </h3>
+                    <div class="flex gap-2 mb-4">
+                        <input id="search-query" type="text" 
+                            class="flex-1 bg-[#050505] border border-m8-border p-2 text-xs font-mono focus:border-m8-primary focus:outline-none text-white"
+                            placeholder="Search vector space...">
+                        <button onclick="searchMemory()" 
+                            class="px-4 bg-m8-border hover:bg-white hover:text-black text-white text-xs font-mono transition-colors">
+                            FIND
+                        </button>
+                    </div>
+                    
+                    <!-- Results Area -->
+                    <div id="search-results" class="space-y-2">
+                        <!-- Results injected here -->
+                        <div class="text-[10px] text-m8-dim font-mono text-center py-4 italic">No active search results</div>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- Telemetry Footer -->
+            <div class="p-4 border-t border-m8-border bg-[#050505]">
+                <div class="text-[10px] font-mono text-m8-dim mb-2 uppercase">Runtime Metrics</div>
+                <div class="grid grid-cols-2 gap-2">
+                    <div class="bg-m8-surface border border-m8-border p-2">
+                        <div class="text-[10px] text-m8-dim">Latency</div>
+                        <div id="stat-latency" class="text-lg font-bold text-m8-primary">0ms</div>
+                    </div>
+                    <div class="bg-m8-surface border border-m8-border p-2">
+                        <div class="text-[10px] text-m8-dim">Status</div>
+                        <div id="stat-status" class="text-xs font-bold text-green-500 mt-1">IDLE</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script>
+        const API_URL = ""; 
+
+        // --- Utility Functions ---
+        function updateTelemetry(tms) {
+            if (!tms) return;
+            // Extract numerical value assuming format like "35000 µs" or similar
+            const cleanTms = tms.replace(/[^0-9.]/g, ''); 
+            
+            // Convert micro to milli for display if huge, or keep as is.
+            // M8 usually returns microseconds.
+            let displayTime = "";
+            if (parseInt(cleanTms) > 1000) {
+                displayTime = (parseInt(cleanTms) / 1000).toFixed(2) + " ms";
+            } else {
+                displayTime = cleanTms + " µs";
+            }
+
+            document.getElementById('latency-meter').innerText = `OP: ${displayTime}`;
+            document.getElementById('stat-latency').innerText = displayTime;
+            
+            // Flash effect
+            const el = document.getElementById('stat-latency');
+            el.classList.add('text-white');
+            setTimeout(() => el.classList.remove('text-white'), 200);
+        }
+
+        function appendMessage(role, text, telemetry = null) {
+            const history = document.getElementById('chat-history');
+            const isUser = role === 'USER';
+            
+            const div = document.createElement('div');
+            div.className = "flex gap-4 max-w-3xl " + (isUser ? "flex-row-reverse ml-auto" : "");
+            
+            let avatar = isUser 
+                ? `<div class="w-8 h-8 rounded-sm bg-white/10 border border-white/20 flex items-center justify-center shrink-0 text-white text-xs"><i class="fas fa-user"></i></div>`
+                : `<div class="w-8 h-8 rounded-sm bg-m8-surface border border-m8-border flex items-center justify-center shrink-0 text-m8-primary text-xs font-mono">M8</div>`;
+
+            let meta = telemetry ? `<span class="ml-2 text-[10px] font-mono text-m8-primary bg-m8-primary/10 px-1 rounded">${telemetry}</span>` : '';
+
+            div.innerHTML = `
+                ${avatar}
+                <div class="${isUser ? 'text-right' : ''}">
+                    <div class="text-xs font-mono text-m8-dim mb-1 flex items-center ${isUser ? 'justify-end' : ''}">
+                        ${role} ${meta}
+                    </div>
+                    <div class="text-sm leading-relaxed ${isUser ? 'text-white' : 'text-gray-300'} whitespace-pre-wrap">${text}</div>
+                </div>
+            `;
+            
+            history.appendChild(div);
+            history.scrollTop = history.scrollHeight;
+        }
+
+        // --- API Interactions ---
+
+        async function sendChat() {
+            const input = document.getElementById('chat-input');
+            const text = input.value.trim();
+            if (!text) return;
+
+            appendMessage('USER', text);
+            input.value = '';
+            document.getElementById('stat-status').innerText = "INFERRING...";
+
+            try {
+                const res = await fetch(`${API_URL}/chat`, {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({ prompt: text })
+                });
+                const data = await res.json();
+                
+                if(data.status === 'success') {
+                    updateTelemetry(data.telemetry);
+                    appendMessage('M8P', data.result, data.telemetry);
+                } else {
+                    appendMessage('SYSTEM', 'Error: ' + JSON.stringify(data));
+                }
+            } catch (e) {
+                appendMessage('SYSTEM', 'Connection Error: ' + e.message);
+            }
+            document.getElementById('stat-status').innerText = "IDLE";
+        }
+
+        async function indexContent() {
+            const input = document.getElementById('index-content');
+            const text = input.value.trim();
+            if (!text) return;
+
+            document.getElementById('stat-status').innerText = "INDEXING...";
+            
+            try {
+                const res = await fetch(`${API_URL}/index`, {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({ content: text })
+                });
+                const data = await res.json();
+                
+                updateTelemetry(data.telemetry);
+                input.value = '';
+                
+                // Show toast or log
+                const resultsContainer = document.getElementById('search-results');
+                resultsContainer.innerHTML = `
+                    <div class="bg-green-900/20 border border-green-500/30 p-2">
+                        <div class="text-[10px] text-green-500 font-mono">SUCCESSFULLY INDEXED</div>
+                        <div class="text-xs text-white truncate">${text}</div>
+                    </div>
+                ` + resultsContainer.innerHTML;
+
+            } catch (e) {
+                alert('Indexing failed');
+            }
+            document.getElementById('stat-status').innerText = "IDLE";
+        }
+
+        async function searchMemory() {
+            const query = document.getElementById('search-query').value;
+            if(!query) return;
+
+            document.getElementById('stat-status').innerText = "SEARCHING...";
+            const container = document.getElementById('search-results');
+            container.innerHTML = '<div class="text-center text-xs font-mono text-m8-dim animate-pulse">Scanning Vector Space...</div>';
+
+            try {
+                const res = await fetch(`${API_URL}/search`, {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({ query: query })
+                });
+                const data = await res.json();
+                updateTelemetry(data.telemetry);
+
+                container.innerHTML = '';
+                if (data.result && data.result.length > 0) {
+                    data.result.forEach(item => {
+                        // Assuming item is string or object depending on M8 script return
+                        // The script returned <matches>, which is usually a list of strings/objects
+                        // We'll treat it generically
+                        const content = typeof item === 'object' ? JSON.stringify(item) : item;
+                        
+                        container.innerHTML += `
+                            <div class="bg-[#111] border border-m8-border p-3 hover:border-m8-primary transition-colors cursor-default group">
+                                <div class="flex justify-between mb-1">
+                                    <span class="text-[10px] font-mono text-m8-primary">MATCH</span>
+                                    <span class="text-[10px] font-mono text-m8-dim group-hover:text-white">ID: ${Math.floor(Math.random()*1000)}</span>
+                                </div>
+                                <div class="text-xs text-gray-400 font-mono line-clamp-3">${content}</div>
+                            </div>
+                        `;
+                    });
+                } else {
+                    container.innerHTML = '<div class="text-[10px] text-m8-dim font-mono text-center py-4">No matches found</div>';
+                }
+
+            } catch (e) {
+                container.innerHTML = `<div class="text-xs text-red-500 font-mono">Error: ${e.message}</div>`;
+            }
+            document.getElementById('stat-status').innerText = "IDLE";
+        }
+
+        async function resetSession() {
+            if(!confirm("Destroy Agent Memory Session?")) return;
+            await fetch(`${API_URL}/reset`, { method: 'POST' });
+            window.location.reload();
+        }
+
+        // Handle Enter key in chat
+        document.getElementById('chat-input').addEventListener('keydown', function(e) {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                sendChat();
+            }
+        });
+    </script>
+</body>
+</html>
