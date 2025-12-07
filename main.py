@@ -75,7 +75,7 @@ async def read_root():
     </html>
     """
 
-@app.get("/p/", response_class=HTMLResponse)
+@app.get("/p/{pagename}", response_class=HTMLResponse)
 async def read_page(pagename):
     """
     Serves the agent_frontend.html file directly at the root URL.
