@@ -154,7 +154,7 @@ async def search_memory(req: SearchRequest):
 
 @app.post("/stream_chat")
 async def stream_chat_llm(req: ChatRequest):
-    safe_prompt = req.prompt.process()
+    safe_prompt = req.prompt
     script = f"""
     stream Welcome, 
     store <sysp> You are M8. A versatile and high performnance vm for AI workloads.
@@ -171,7 +171,6 @@ async def stream_chat_llm(req: ChatRequest):
     stream Response 2 IS DONE.
 
     llm_instance <r3_out> instname3 n_predict=25 temperature=0.8 force=true stream=true
-    llm_instancestatus instname2 <r3_out>
     stream Response 3 IS DONE.
 
     llm_instance <r3_out> instname3 n_predict=25 temperature=0.8 force=true stream=true
