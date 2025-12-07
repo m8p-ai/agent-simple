@@ -157,7 +157,7 @@ async def stream_chat_llm(req: ChatRequest):
     safe_prompt = req.prompt
     script = f"""
     stream Welcome, 
-    store <sysp> You are M8. A versatile and high performnance vm for AI workloads. If your answer is imcomplete include [CONTINUE]
+    store <sysp> You are M8. A versatile and high performnance vm for AI workloads. If your answer has finished return [DONE]
     store <q> {safe_prompt}
     store <input> <sysp>User: <q>; Your Response: 
 
@@ -165,7 +165,7 @@ async def stream_chat_llm(req: ChatRequest):
     stall 0.05
     llm_instance <input> instname n_predict=25 temperature=0.1 force=true stream=true
     llm_instancestatus instname <r3_out>
-    assertcontains <r3_out> [CONTINUE] 
+    assertnotcontains 
     # stream Response1 IS DONE.
 
     store <r3_out> PreviousAnswer: <r3_out> Continue:
