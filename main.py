@@ -158,7 +158,8 @@ async def stream_chat_llm(req: ChatRequest):
     script = f"""
     stream Welcome, 
     store <sysp> You are M8. A versatile and high performnance vm for AI workloads.
-    store <input> <sysp>User: {safe_prompt}; Your Response: 
+    store <q> {safe_prompt}
+    store <input> <sysp>User: <q>; Your Response: 
 
     stream Begining processing...
     stall 0.05
@@ -166,13 +167,16 @@ async def stream_chat_llm(req: ChatRequest):
     llm_instancestatus instname <r3_out>
     stream Response1 IS DONE.
 
+    store <r3_out> Question: <q>; PreviousAnswer: <r3_out> YourAnswer:
     llm_instance <r3_out> instname2 n_predict=15 temperature=0.5 force=true stream=true
     llm_instancestatus instname2 <r3_out>
     stream Response 2 IS DONE.
 
+    store <r3_out> Question: <q>; PreviousAnswer: <r3_out> YourAnswer:
     llm_instance <r3_out> instname3 n_predict=25 temperature=0.8 force=true stream=true
     stream Response 3 IS DONE.
 
+    store <r3_out> Question: <q>; PreviousAnswer: <r3_out> YourAnswer:
     llm_instance <r3_out> instname3 n_predict=25 temperature=0.8 force=true stream=true
     stream Response 4 IS DONE.
     """
