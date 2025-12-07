@@ -16,7 +16,7 @@ class M8:
     def _post_request(url: str, payload: Dict[str, Any], timeout: int = DEFAULT_TIMEOUT) -> Any:
         print("URL: ", url)
         headers = {'content-type': 'application/json'}
-        tries = 3
+        tries = 1
         
         while tries > 0:
             tries -= 1
