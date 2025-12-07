@@ -145,8 +145,21 @@ async def stream_chat_llm(req: ChatRequest):
     # We use 'llm_stream' which presumably utilizes the 'stream' opcode
     # to emit tokens as they are generated.
     script = f"""
-    store <input> "{safe_prompt}"
-    stream <input>
+    store <sysp> You are M8. A versatile and high performnance vm for AI workloads.
+    store <input> <sysp>User: {safe_prompt}; Your Response: 
+    llm_instance <input> instname n_predict=24 temperature=0.1 force=true 
+    llm_instancestatus instname <r3_out>
+    stream <r3_out>
+    stall 1
+
+    llm_instance <input> instname2 n_predict=25 temperature=0.5 force=true 
+    llm_instancestatus instname2 <r3_out>
+    stream <r3_out>
+    stall 0.5
+
+    llm_instance <input> instname3 n_predict=25 temperature=0.8 force=true 
+    llm_instancestatus instname3 <r3_out>
+    stream <r3_out>
     """
     
     return StreamingResponse(
