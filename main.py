@@ -159,25 +159,24 @@ async def stream_chat_llm(req: ChatRequest):
     """
     safe_prompt = req.prompt.replace('"', '\\"')
     
-    # We use 'llm_stream' which presumably utilizes the 'stream' opcode
-    # to emit tokens as they are generated.
+    # We use 'stream' which to emit tokens as they are generated.
     script = f"""
     stream Welcome, 
     store <sysp> You are M8. A versatile and high performnance vm for AI workloads.
     store <input> <sysp>User: {safe_prompt}; Your Response: 
 
-    stream Begining processing
+    stream Begining processing...  
     stall 0.05
     llm_instance <input> instname n_predict=25 temperature=0.1 force=true stream=true
     llm_instancestatus instname <r3_out>
-    stream Response1 IS DONE
+    stream Response1 IS DONE.  
 
     llm_instance <r3_out> instname2 n_predict=15 temperature=0.5 force=true stream=true
     llm_instancestatus instname2 <r3_out>
-    stream Response2 IS DONE
+    stream Response 2 IS DONE.  
 
     llm_instance <r3_out> instname3 n_predict=25 temperature=0.8 force=true stream=true
-    stream Response 3 IS DONE
+    stream Response 3 IS DONE.  
     """
     
     return StreamingResponse(
