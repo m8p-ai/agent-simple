@@ -8,7 +8,7 @@ import uuid
 app = FastAPI(title="M8P Vector Agent", description="High-performance agent using M8P Hypervisor")
 
 # --- Constants ---
-AGENT_SESSION_ID = "M8_AGENT_MAIN_V1"
+AGENT_SESSION_ID = "M8_AGENT_MAINx_V1"
 VECTOR_DB_NAME = "AGENT_MEMORY"
 EMBED_DIM = 768 # Adjust based on your model (e.g. 768 for Nomic, 4096 for Llama3/Mistral usually)
 MAX_ELEMENTS = 1000
