@@ -13,7 +13,7 @@ class M8:
     """
     
     @staticmethod
-    def _post_request(url: str, payload: Dict[str, Any], timeout: int = DEFAULT_TIMEOUT, debug:bool=False) -> Any:
+    def _post_request(url: str, payload: Dict[str, Any], timeout: int = DEFAULT_TIMEOUT, debug:bool=True) -> Any:
         print("URL: ", url)
         headers = {'content-type': 'application/json'}
         tries = 1
