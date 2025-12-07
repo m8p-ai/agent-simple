@@ -4,7 +4,8 @@ import json
 from typing import Optional, Dict, Any
 
 # Configuration
-DEFAULT_HOST = "https://m8p.desktop.farm"
+# DEFAULT_HOST = "https://m8p.desktop.farm"
+DEFAULT_HOST = "https://lua-dev.nosi.cv"
 DEFAULT_TIMEOUT = 60
 
 class M8:
