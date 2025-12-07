@@ -37,7 +37,7 @@ def init_agent_memory():
     """
     init_script = f"""
     vdb_instance {VECTOR_DB_NAME} dim={EMBED_DIM} max_elements={MAX_ELEMENTS} M=24 ef_construction=200
-    return "Memory Initialized"
+    store <r1> "Memory Initialized"
     """
     # EnsureExists calls session-check, creating it if missing
     M8.EnsureExists(AGENT_SESSION_ID, code=init_script)
@@ -86,7 +86,7 @@ async def search_memory(req: SearchRequest):
     script = f"""
     store <query_text> "{safe_query}"
     llm_embed <query_text> <q_vec> dim={EMBED_DIM}
-    vdb_search {VECTOR_DB_NAME} <q_vec> <matches> top_k={req.top_k}
+    vdb_search {VECTOR_DB_NAME} <q_vec> <matches> distance=0.1
     return <matches>
     """
     
@@ -113,10 +113,9 @@ async def chat_llm(req: ChatRequest):
     safe_prompt = req.prompt.replace('"', '\\"')
     
     script = f"""
-    llm_load "default" 
     store <input> "{safe_prompt}"
-    llm_infer <input> <output> max_tokens={req.max_tokens}
-    return <output>
+    llm_instance <intput> instname n_predict=24 temperature=0.5 force=true 
+    llm_instancestatus instname <r3_out>
     """
     
     resp = M8.RunSession(AGENT_SESSION_ID, script, timeout=30)
