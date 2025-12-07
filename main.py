@@ -101,7 +101,7 @@ async def search_memory(req: SearchRequest):
 
     # M8 returns the result in the 'Ret' field usually, or raw body depending on implementation
     # Assuming 'Ret' contains the return value from the script
-    result_data = resp.get('R', [])
+    result_data = [resp.get('R')]
     
     return CommandResponse(
         status="success",
