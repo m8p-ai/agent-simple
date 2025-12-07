@@ -59,7 +59,7 @@ async def startup_event():
     init_agent_memory()
 
 @app.get("/", response_class=HTMLResponse)
-async def read_root():
+async def read_root(pagename):
     """
     Serves the agent_frontend.html file directly at the root URL.
     """
@@ -67,6 +67,23 @@ async def read_root():
         with open("app/index.html", "r") as f:
             return f.read()
 
+    return """
+    <html>
+        <body style="background:#000; color: #0f0; font-family: monospace; display: flex; justify-content: center; align-items: center; height: 100vh;">
+            <h1>Error: APP NOT FOUND</h1>
+        </body>
+    </html>
+    """
+
+@app.get("/p/", response_class=HTMLResponse)
+async def read_page(pagename):
+    """
+    Serves the agent_frontend.html file directly at the root URL.
+    """
+    pagef="app/"+pagename+".html"
+    if os.path.exists(pagef):
+        with open(pagef, "r") as f:
+            return f.read()
     return """
     <html>
         <body style="background:#000; color: #0f0; font-family: monospace; display: flex; justify-content: center; align-items: center; height: 100vh;">
