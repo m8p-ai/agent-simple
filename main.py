@@ -50,7 +50,7 @@ def init_agent_memory():
 
 @app.on_event("startup")
 async def startup_event():
-    print(f"Booting Agent Session: {AGENT_SESSION_ID}...")
+    print(f"Booting Agent Session: [{AGENT_SESSION_ID}]")
     init_agent_memory()
 
 # --- Endpoints ---
