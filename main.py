@@ -26,10 +26,10 @@ class ChatRequest(BaseModel):
 
 class CommandResponse(BaseModel):
     status: str
-    result: Any = None
-    telemetry: Any = None
+    result: any = None
+    telemetry: any = None
 
-from typing import Any
+from typing import any
 
 # --- Helper to Initialize Session ---
 def init_agent_memory():
