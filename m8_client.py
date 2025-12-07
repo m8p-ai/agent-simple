@@ -29,10 +29,10 @@ class M8:
                 except json.JSONDecodeError:
                     return resp.text
                     
-            except requests.exceptions.ConnectionError:
-                print(f"Warning: Connection Error to {url}. Retrying...")
-            except requests.exceptions.ConnectTimeout:
-                print(f"Warning: Connection Timeout to {url}. Retrying...")
+            except requests.exceptions.ConnectionError as e:
+                print(f"Warning: Connection Error to {url}. {str(e)} Retrying...")
+            except requests.exceptions.ConnectTimeout as e:
+                print(f"Warning: Connection Timeout to {url}. {str(e)} Retrying...")
             except Exception:
                 return {
                     'Status': "FAILED",
