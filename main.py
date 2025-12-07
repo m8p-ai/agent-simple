@@ -64,7 +64,7 @@ async def index_document(req: IndexRequest):
     llm_embed <doc_text> <embedding> dim={EMBED_DIM}
     align <embedding> {EMBED_DIM}
     vdb_add {VECTOR_DB_NAME} <embedding> {safe_content}
-    return "Indexed"
+    store <rr> "Indexed"
     """
     
     resp = M8.RunSession(AGENT_SESSION_ID, script, timeout=10)
