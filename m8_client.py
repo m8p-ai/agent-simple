@@ -2,7 +2,7 @@ import requests
 import traceback
 import json
 import os
-from typing import Optional, Dict, Any
+from typing import Optional, Dict, Any, Generator
 
 # Configuration
 # "https://lua-dev.nosi.cv"
@@ -46,6 +46,31 @@ class M8:
                 }
         
         return {'Status': "FAILED", 'Msg': "Max retries exceeded"}
+
+    @staticmethod
+    def StreamSession(session_id: str, code: str, host: str = None) -> Generator[str, None, None]:
+        """
+        Connects to the M8 session-stream endpoint and yields data chunks 
+        emitted by the 'stream' opcode.
+        """
+        base_host = host or DEFAULT_HOST
+        # Using the specific streaming endpoint requested
+        url = f"{base_host}/api/v1/m8/session-stream"
+        
+        headers = {'content-type': 'application/json'}
+        payload = {
+            'id': session_id,
+            'code': code
+        }
+
+        try:
+            with requests.post(url, json=payload, headers=headers, stream=True, timeout=120) as r:
+                r.raise_for_status()
+                for chunk in r.iter_content(chunk_size=None):
+                    if chunk:
+                        yield chunk
+        except Exception as e:
+            yield f"[System Error: {str(e)}]"
 
     @staticmethod
     def LLM_Call(url: str, req_obj: Dict[str, Any], timeout: int = 60):

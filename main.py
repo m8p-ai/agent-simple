@@ -1,6 +1,6 @@
 from fastapi import FastAPI, HTTPException, BackgroundTasks
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import HTMLResponse
+from fastapi.responses import HTMLResponse, StreamingResponse
 from pydantic import BaseModel
 from m8_client import M8
 from typing import Any
@@ -132,6 +132,26 @@ async def search_memory(req: SearchRequest):
         status="success",
         result=result_data,
         telemetry=resp.get('Tms')
+    )
+
+
+@app.post("/stream_chat")
+async def stream_chat_llm(req: ChatRequest):
+    """
+    Streams LLM output using the M8 'stream' opcode channel.
+    """
+    safe_prompt = req.prompt.replace('"', '\\"')
+    
+    # We use 'llm_stream' which presumably utilizes the 'stream' opcode
+    # to emit tokens as they are generated.
+    script = f"""
+    store <input> "{safe_prompt}"
+    stream <input>
+    """
+    
+    return StreamingResponse(
+        M8.StreamSession(AGENT_SESSION_ID, script),
+        media_type="text/plain"
     )
 
 @app.post("/chat", response_model=CommandResponse)
