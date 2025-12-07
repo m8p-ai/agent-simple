@@ -4,7 +4,7 @@ import json
 from typing import Optional, Dict, Any
 
 # Configuration
-DEFAULT_HOST = "https://m8p.desktop.farm" 
+DEFAULT_HOST = "https://m8p.desktop.farm"
 DEFAULT_TIMEOUT = 60
 
 class M8:
@@ -13,7 +13,7 @@ class M8:
     """
     
     @staticmethod
-    def _post_request(url: str, payload: Dict[str, Any], timeout: int = DEFAULT_TIMEOUT) -> Any:
+    def _post_request(url: str, payload: Dict[str, Any], timeout: int = DEFAULT_TIMEOUT, debug:bool=False) -> Any:
         print("URL: ", url)
         headers = {'content-type': 'application/json'}
         tries = 1
@@ -25,7 +25,8 @@ class M8:
                 # Attempt to parse JSON, fall back to text if response isn't JSON
                 try:
                     R=resp.json()
-                    print("Return: ", R)
+                    if debug:
+                        print("Return: ", R)
                     return R
                 except json.JSONDecodeError:
                     return resp.text
