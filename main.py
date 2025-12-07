@@ -165,7 +165,6 @@ async def stream_chat_llm(req: ChatRequest):
     stall 0.05
     llm_instance <input> instname n_predict=25 temperature=0.1 force=true stream=true
     llm_instancestatus instname <r3_out>
-    assertnotcontains 
     # stream Response1 IS DONE.
 
     store <r3_out> PreviousAnswer: <r3_out> Continue:
