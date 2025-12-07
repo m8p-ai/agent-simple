@@ -128,7 +128,7 @@ async def chat_llm(req: ChatRequest):
 
     return CommandResponse(
         status="success",
-        result=resp.get('Ret'),
+        result=resp.get('R'),
         telemetry=resp.get('Tms')
     )
 
