@@ -171,7 +171,7 @@ async def stream_chat_llm(req: ChatRequest):
     llm_instancestatus instname <r3_out>
     # stream Response1 IS DONE
 
-    llm_instance <r3_out> instname2 n_predict=65 temperature=0.5 force=true stream=true
+    llm_instance <r3_out> instname2 n_predict=15 temperature=0.5 force=true stream=true
     llm_instancestatus instname2 <r3_out>
     # stream Response2 IS DONE
 
