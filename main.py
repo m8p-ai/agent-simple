@@ -154,12 +154,7 @@ async def search_memory(req: SearchRequest):
 
 @app.post("/stream_chat")
 async def stream_chat_llm(req: ChatRequest):
-    """
-    Streams LLM output using the M8 'stream' opcode channel.
-    """
-    safe_prompt = req.prompt.replace('"', '\\"')
-    
-    # We use 'stream' which to emit tokens as they are generated.
+    safe_prompt = req.prompt.replace('"', '\\"')    
     script = f"""
     stream Welcome, 
     store <sysp> You are M8. A versatile and high performnance vm for AI workloads.
@@ -178,7 +173,6 @@ async def stream_chat_llm(req: ChatRequest):
     llm_instance <r3_out> instname3 n_predict=25 temperature=0.8 force=true stream=true
     stream Response 3 IS DONE.
     """
-    
     return StreamingResponse(
         M8.StreamSession(AGENT_SESSION_ID, script),
         media_type="text/plain"

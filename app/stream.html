@@ -300,10 +300,9 @@
                         try {
                             const jsonStr = trimmedLine.substring(6); // Remove 'data: '
                             const data = JSON.parse(jsonStr);
-
-                            if (data.event) {
+                            if (data.event || data.content) {
                                 // Clean up the event text if it's double-quoted
-                                let content = data.event;
+                                let content = data.event || data.content;
                                 if (typeof content === 'string') {
                                     if (content.startsWith('"') && content.endsWith('"') && content.length > 1) {
                                         content = content.slice(1, -1);
