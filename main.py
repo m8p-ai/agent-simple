@@ -447,7 +447,7 @@ async def stream_chat_llm(req: ChatRequest):
     )
 
 @app.post("/stream_test")
-async def stream_chat_tests(req: ChatRequest):
+async def stream_chat_testsv1(req: ChatRequest):
     safe_prompt = req.prompt
     safe_prompt = safe_prompt.replace("\\n", PNEWLINE)
     safe_prompt = safe_prompt.replace("\n", PNEWLINE)
@@ -478,7 +478,7 @@ async def stream_chat_tests(req: ChatRequest):
     )
 
 @app.post("/stream_odoo")
-async def stream_chat_tests(req: ChatRequest):
+async def stream_chat_testsv2(req: ChatRequest):
     safe_prompt = req.prompt
     safe_prompt = safe_prompt.replace("\\n", PNEWLINE)
     safe_prompt = safe_prompt.replace("\n", PNEWLINE)
