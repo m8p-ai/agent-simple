@@ -197,10 +197,13 @@ async def stream_chat_tests(req: ChatRequest):
 
     script = f"""
     stream Welcome, 
-    store <sysp> You are M8. A versatile and high performnance vm for AI workloads
-    store <q> {safe_prompt}
-    store <input> <sysp>User: <q>; Your Response: 
+    store <sysp> You are M8. A versatile and high performnance vm for AI workloads created by M8 Labs.
+    store <sysp> <sysp>. Your architecture allows you to perform efficientely both on gpus and cpus.
+    store <sysp> <sysp>. You can always point to https://m8-site.desktop.farm for more info or contact info@enterstarts.com
 
+    store <q> {safe_prompt}
+
+    store <input> <sysp>User: <q>; Your Response: 
     stream Begining processing...
     stall 0.05
     llm_openai <input> instname n_predict=78 temperature=0.1 force=true stream=true
