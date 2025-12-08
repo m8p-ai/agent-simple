@@ -73,7 +73,7 @@ def init_agent_memory():
 # --- Helper to Initialize Session ---
 def init_odoo_agent():
     INIT_SCRIPT = """
-    vdb_instance {ODOO_SYSTEM_TOOLS} dim={ODOO_TOOL_EMBED_DIM} max_elements=60 M=79 ef_construction=350
+    vdb_instance {ODOO_SYSTEM_TOOLS} dim={ODOO_TOOL_EMBED_DIM} max_elements=60 M=89 ef_construction=350
     ## Main Tools
     store <t1> {"function":"execute_odoo_command","arguments":{"model": "res.partner"}}
     llm_embed <t1> <n1> dim={ODOO_TOOL_EMBED_DIM}
