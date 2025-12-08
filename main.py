@@ -123,25 +123,71 @@ async def stream_chat_tests(req: ChatRequest):
     script = f"""
     store <sysp> You are FactorAI Odoo Enterprise. You provide functionality
     store <sysp> <sysp>. 
-
     store <q> {safe_prompt}
     llm_embed <q> <curr> dim={ODOO_TOOL_EMBED_DIM}
     vdb_search {ODOO_SYSTEM_TOOLS} <curr> <match> distance=0.1
     llm_detokenize <match> <response>
-    stream <response>
-
-    # stream Begining processing...
-    # stall 0.05
-    llm_openai <sysp> instname n_predict=78 temperature=0.1 force=true stream=true
+    llm_instance <input> instname n_predict=24 temperature=0.5 force=true 
     llm_instancestatus instname <r3_out>
-    #llm_openai <input> instname n_predict=78 temperature=0.1 force=true stream=true
-    #llm_openai <input> instname n_predict=78 temperature=0.1 force=true stream=true
     """
 
-    return StreamingResponse(
-        M8.StreamSession(AGENT_SESSION_ID, script),
-        media_type="text/plain"
+    # stream <response>
+    # stream Begining processing...
+    # stall 0.05
+    # llm_openai <sysp> instname n_predict=78 temperature=0.1 force=true stream=true
+    # llm_instancestatus instname <r3_out>
+    #llm_openai <input> instname n_predict=78 temperature=0.1 force=true stream=true
+    #llm_openai <input> instname n_predict=78 temperature=0.1 force=true stream=true
+    
+    resp = M8.RunSession(ODOO_AGENT_SESSION_ID, script, timeout=30)
+    
+    if isinstance(resp, dict) and resp.get('Status') != 'OK':
+        raise HTTPException(status_code=500, detail=f"M8 Error: {resp.get('Msg')}")
+
+    return CommandResponse(
+        status="success",
+        result=resp.get('R'),
+        telemetry=resp.get('Tms')
     )
+
+@app.post("/execute_odoo")
+async def execute_chat_odoo(req: ChatRequest):
+    safe_prompt = sanitize(req.prompt)
+
+    script = f"""
+    store <sysp> You are FactorAI Odoo Enterprise. You provide functionality
+    store <sysp> <sysp>. 
+    store <q> {safe_prompt}
+    llm_embed <q> <curr> dim={ODOO_TOOL_EMBED_DIM}
+    vdb_search {ODOO_SYSTEM_TOOLS} <curr> <match> distance=0.1
+    llm_detokenize <match> <response>
+    llm_instance <input> instname n_predict=24 temperature=0.5 force=true 
+    llm_instancestatus instname <r3_out>
+    """
+
+    # stream <response>
+    # stream Begining processing...
+    # stall 0.05
+    # llm_openai <sysp> instname n_predict=78 temperature=0.1 force=true stream=true
+    # llm_instancestatus instname <r3_out>
+    #llm_openai <input> instname n_predict=78 temperature=0.1 force=true stream=true
+    #llm_openai <input> instname n_predict=78 temperature=0.1 force=true stream=true
+    
+    resp = M8.RunSession(ODOO_AGENT_SESSION_ID, script, timeout=30)
+    
+    if isinstance(resp, dict) and resp.get('Status') != 'OK':
+        raise HTTPException(status_code=500, detail=f"M8 Error: {resp.get('Msg')}")
+
+    return CommandResponse(
+        status="success",
+        result=resp.get('R'),
+        telemetry=resp.get('Tms')
+    )
+
+    # return StreamingResponse(
+    #     M8.StreamSession(AGENT_SESSION_ID, script),
+    #     media_type="text/plain"
+    # )
 
 
 @app.on_event("startup")
@@ -366,36 +412,36 @@ async def stream_chat_tests(req: ChatRequest):
         media_type="text/plain"
     )
 
-@app.post("/stream_odoo")
-async def stream_chat_tests(req: ChatRequest):
-    safe_prompt = req.prompt
-    safe_prompt = safe_prompt.replace("\\n", PNEWLINE)
-    safe_prompt = safe_prompt.replace("\n", PNEWLINE)
-    safe_prompt = safe_prompt.replace("\t", "")
-    safe_prompt = safe_prompt.replace("\\t", "")
-    safe_prompt = safe_prompt.replace("<", "")
-    safe_prompt = safe_prompt.replace(">", "")
+# @app.post("/stream_odoo")
+# async def stream_chat_tests(req: ChatRequest):
+#     safe_prompt = req.prompt
+#     safe_prompt = safe_prompt.replace("\\n", PNEWLINE)
+#     safe_prompt = safe_prompt.replace("\n", PNEWLINE)
+#     safe_prompt = safe_prompt.replace("\t", "")
+#     safe_prompt = safe_prompt.replace("\\t", "")
+#     safe_prompt = safe_prompt.replace("<", "")
+#     safe_prompt = safe_prompt.replace(">", "")
 
-    script = f"""
-    store <sysp> You are M8. A versatile and high performnance vm for AI workloads created by M8 Labs.
-    store <sysp> <sysp>. Your architecture allows you to perform efficientely both on gpus and cpus.
-    store <sysp> <sysp>. You can always point to https://m8-site.desktop.farm for more info or contact info@enterstarts.com
-    store <sysp> <sysp>. The tasks you can help with are: Tool-Execution, Get-Weather and GetStockPrice
+#     script = f"""
+#     store <sysp> You are M8. A versatile and high performnance vm for AI workloads created by M8 Labs.
+#     store <sysp> <sysp>. Your architecture allows you to perform efficientely both on gpus and cpus.
+#     store <sysp> <sysp>. You can always point to https://m8-site.desktop.farm for more info or contact info@enterstarts.com
+#     store <sysp> <sysp>. The tasks you can help with are: Tool-Execution, Get-Weather and GetStockPrice
 
-    store <q> {safe_prompt}
-    store <input> <sysp>User: <q>; Your Response: 
-    # stream Begining processing...
-    # stall 0.05
-    llm_openai <input> instname n_predict=78 temperature=0.1 force=true stream=true
-    llm_openai <input> instname n_predict=78 temperature=0.1 force=true stream=true
-    llm_openai <input> instname n_predict=78 temperature=0.1 force=true stream=true
-    llm_instancestatus instname <r3_out>
-    """
+#     store <q> {safe_prompt}
+#     store <input> <sysp>User: <q>; Your Response: 
+#     # stream Begining processing...
+#     # stall 0.05
+#     llm_openai <input> instname n_predict=78 temperature=0.1 force=true stream=true
+#     llm_openai <input> instname n_predict=78 temperature=0.1 force=true stream=true
+#     llm_openai <input> instname n_predict=78 temperature=0.1 force=true stream=true
+#     llm_instancestatus instname <r3_out>
+#     """
 
-    return StreamingResponse(
-        M8.StreamSession(AGENT_SESSION_ID, script),
-        media_type="text/plain"
-    )
+#     return StreamingResponse(
+#         M8.StreamSession(AGENT_SESSION_ID, script),
+#         media_type="text/plain"
+#     )
 
 @app.post("/chat", response_model=CommandResponse)
 async def chat_llm(req: ChatRequest):
