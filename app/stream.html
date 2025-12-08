@@ -248,14 +248,11 @@
         }
 
         // --- API Interactions ---
-        let toolMap = {}
-        let tool_id = '';
-        let is_running = false;
 
         async function sendChat() {
             const input = document.getElementById('chat-input');
             const text = input.value.trim();
-            if (!text || is_running) return;
+            if (!text) return;
 
             // User Message
             const userContent = createMessageBubble('USER');
@@ -269,11 +266,9 @@
             m8Content.classList.add('typing-cursor');
             
             let finalTms = null;
-            is_running = true;
 
             try {
-                // const response = await fetch(`${API_URL}/stream_chat`, {
-                const response = await fetch(`${API_URL}/stream_test`, {
+                const response = await fetch(`${API_URL}/stream_chat`, {
                     method: 'POST',
                     headers: {'Content-Type': 'application/json'},
                     body: JSON.stringify({ prompt: text })
@@ -297,7 +292,6 @@
                     const lines = buffer.split('\n');
                     // Keep the incomplete part for the next chunk
                     buffer = lines.pop(); 
-                    // var tool_id='';
 
                     for (const line of lines) {
                         const trimmedLine = line.trim();
@@ -306,8 +300,6 @@
                         try {
                             const jsonStr = trimmedLine.substring(6); // Remove 'data: '
                             const data = JSON.parse(jsonStr);
-                            // console.info("jsonStr: ", jsonStr);
-
                             if (data.event || data.content) {
                                 // Clean up the event text if it's double-quoted
                                 let content = data.event || data.content;
@@ -318,58 +310,11 @@
                                     // Handle encoded newlines
                                     content = content.replace(/\\n/g, '\n');
                                 }
-
-                                m8Content.textContent += content;                                
+                                m8Content.textContent += content;
+                                
+                                // Update scroll
                                 const history = document.getElementById('chat-history');
                                 history.scrollTop = history.scrollHeight;
-                            } else if (data.delta) {
-                                var d=data.delta;
-                                if (d.content) {
-                                    m8Content.textContent += content;
-                                }
-
-                                const history = document.getElementById('chat-history');
-                                history.scrollTop = history.scrollHeight;
-
-                            } else if (data.choices) {
-                                data.choices.forEach((X) => {
-                                    if (X.text&&X.text=="") return;
-                                    if (X.text) {
-                                        m8Content.textContent += X.text;
-                                    } else if (X.delta && X.delta.content) {
-                                        m8Content.textContent += X.delta.content;
-
-                                    } else if(X.delta && X.delta.tool_calls) {
-                                        X.delta.tool_calls.forEach((T) => {
-                                            if (T.id && !toolMap[T.id]) {
-                                                toolMap[T.id] = T.function;
-                                                tool_id = T.id;
-                                                m8Content.textContent += "Tool: "+T.function.name+" ";
-
-                                            } else if(T.function.arguments) {
-                                                toolMap[tool_id].arguments += T.function.arguments ;
-                                                m8Content.textContent += T.function.arguments
-                                            }
-                                        });
-
-                                    } else if (X.finish_reason && X.finish_reason=='tool_calls') {
-                                        console.info('tool_calls: ', tool_id, toolMap);
-                                        var tool_to_execute = tool_calls[tool_id];
-                                        tool_to_execute.status = 'EXECUTING';
-
-                                        
-
-                                        tool_id = null;
-
-                                    } else {
-                                        console.info("TOOL: ", X);
-                                    }
-
-                                    setTimeout(()=>{
-                                        const history = document.getElementById('chat-history');
-                                        history.scrollTop = history.scrollHeight;
-                                    }, 50);
-                                });
                             }
 
                             // Check for final status payload
@@ -391,11 +336,8 @@
             } catch (e) {
                 m8Content.textContent += '\n[Connection Error: ' + e.message + ']';
                 m8Content.classList.add('text-red-500');
-                is_running = false;
-
             } finally {
                 m8Content.classList.remove('typing-cursor');
-                is_running = false;
                 
                 // Append latency badge if available
                 if (finalTms) {
