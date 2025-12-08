@@ -129,6 +129,8 @@ async def stream_chat_tests(req: ChatRequest):
     llm_detokenize <match> <response>
     llm_instance <sysp> instname n_predict=24 temperature=0.5 force=true stream=true
     llm_instancestatus instname <r3_out>
+
+    ret <r3_out> <response>
     """
 
     # stream <response>
