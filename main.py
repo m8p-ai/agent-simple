@@ -161,13 +161,59 @@ async def stream_chat_tests(req: ChatRequest):
     store <sysp> <sysp>. 
     store <q> {safe_prompt}
     llm_embed <q> <curr> dim={ODOO_TOOL_EMBED_DIM}
-    vdb_search {ODOO_SYSTEM_TOOLS} <curr> <match> distance=0.32
+    vdb_search {ODOO_SYSTEM_TOOLS} <curr> <match> distance=0.22
     llm_detokenize <match> <response>
     ret <response>
 
     # llm_instance <sysp> instname n_predict=24 temperature=0.5 force=true stream=true
     # llm_instancestatus instname <r3_out>
     # ret <r3_out> <response>
+    """
+
+    # stream <response>
+    # stream Begining processing...
+    # stall 0.05
+    # llm_openai <sysp> instname n_predict=78 temperature=0.1 force=true stream=true
+    # llm_instancestatus instname <r3_out>
+    #llm_openai <input> instname n_predict=78 temperature=0.1 force=true stream=true
+    #llm_openai <input> instname n_predict=78 temperature=0.1 force=true stream=true
+    
+    resp = M8.RunSession(ODOO_AGENT_SESSION_ID, script, timeout=30)
+    # print("RESP: ", resp)
+    if isinstance(resp, dict) and resp.get('Status') != 'OK':
+        raise HTTPException(status_code=500, detail=f"M8 Error: {resp.get('Err', resp.get('R'))}")
+
+    # buffer = resp.get('R', '')
+
+    return CommandResponse(
+        status="success",
+        result=buffer,
+        telemetry=resp.get('Tms')
+    )
+
+@app.post("/thinking_odoo")
+async def thinking_odoo(req: ChatRequest):
+    safe_prompt = sanitize(req.prompt)
+
+    script = f"""
+    clr <q>
+    clr <curr>
+    clr <match>
+    clr <response>
+    clr <r3_out>
+    store <sysp> You are FactorAI Odoo Enterprise. You provide functionality
+    store <sysp> <sysp>. 
+    store <q> {safe_prompt}
+    llm_embed <q> <curr> dim={ODOO_TOOL_EMBED_DIM}
+    vdb_search {ODOO_SYSTEM_TOOLS} <curr> <match> distance=0.32
+    llm_detokenize <match> <response>
+    # ret <response>
+    # llm_instance <sysp> instname n_predict=24 temperature=0.5 force=true stream=true
+    # llm_instancestatus instname <r3_out>
+    # ret <r3_out> <response>
+    """
+
+    thinking_script = f"""
     """
 
     # stream <response>
