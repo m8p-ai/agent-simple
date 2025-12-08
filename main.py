@@ -168,7 +168,7 @@ async def stream_chat_tests(req: ChatRequest):
     matl2d <curr> <re_response> <r_l2d>
     matcosim <curr> <re_response> <r_cosim>
     store <resp> Question=<q> <<<NL>>> Response = <response> <<<NL>>> l2d=<r_l2d> <<<NL>>> Cosim=<r_cosim> <<<NL>>> Dimension={ODOO_TOOL_EMBED_DIM}
-    store <prompt> Question=<q>; Response = <response>; Your answer
+    store <prompt> Question=<q>; Your answer:
     llm_openai <prompt> instname n_predict=75 temperature=0 force=true stream=false tools=<rtools>
     llm_instancestatus instname <r3_out>
     ret <r3_out> <response>
