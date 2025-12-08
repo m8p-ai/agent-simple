@@ -163,12 +163,12 @@ async def stream_chat_tests(req: ChatRequest):
     llm_embed <q> <curr> dim={ODOO_TOOL_EMBED_DIM}
     vdb_search {ODOO_SYSTEM_TOOLS} <curr> <match> distance=0.32
     llm_detokenize <match> <response>
-    store <response_copy> <response>
+    store <r33> ""<response>""
 
     llm_embed <response> <re_response> dim={ODOO_TOOL_EMBED_DIM}
     matl2d <curr> <re_response> <r_l2d>
     matcosim <curr> <re_response> <r_cosim>
-    store <resp> Response = <response_copy> r_l2d=<r_l2d> matcosim=<r_cosim>
+    store <resp> Response = <r33> r_l2d=<r_l2d> matcosim=<r_cosim>
     ret <resp>
 
     # llm_instance <sysp> instname n_predict=24 temperature=0.5 force=true stream=true
