@@ -21,7 +21,6 @@ AGENT_SESSION_ID = "sess-"+tms
 VECTOR_DB_NAME = "AGENT_MEMORY"
 EMBED_DIM = 188 # Adjust based on your model (e.g. 768 for Nomic, 4096 for Llama3/Mistral usually)
 MAX_ELEMENTS = 1000
-TOOL_DIM={ODOO_TOOL_EMBED_DIM}
 KBASE_DIM=135
 
 ODOO_TOOL_EMBED_DIM = 175
@@ -127,7 +126,7 @@ async def stream_chat_tests(req: ChatRequest):
 
     store <q> {safe_prompt}
     llm_embed <q> <curr> dim={ODOO_TOOL_EMBED_DIM}
-    vdb_search SYSTEM_TOOLS <curr> <match> distance=0.1
+    vdb_search {ODOO_SYSTEM_TOOLS} <curr> <match> distance=0.1
     llm_detokenize <match> <response>
 
     # stream Begining processing...
@@ -229,8 +228,6 @@ async def index_document(req: IndexRequest):
     )
 
 
-
-
 @app.post("/odoo-tool-index", response_model=CommandResponse)
 async def index_odoo_tool(req: IndexRequest):
     """
@@ -244,7 +241,7 @@ async def index_odoo_tool(req: IndexRequest):
     script = f"""
     store <doc_text> {safe_prompt}
     llm_embed <doc_text> <embedding> dim={ODOO_TOOL_EMBED_DIM}
-    vdb_add {VECTOR_DB_NAME} <embedding> {tool_mask}
+    vdb_add {ODOO_SYSTEM_TOOLS} <embedding> {tool_mask}
     store <rr> Indexed
     """
     
