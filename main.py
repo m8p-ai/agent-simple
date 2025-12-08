@@ -170,7 +170,7 @@ async def stream_chat_tests(req: ChatRequest):
     matl2d <re_response> <curr> <r_l2d_x>
     matcosim <re_response> <curr> <r_cosim_x>
 
-    store <resp> Question=<q> <<<NL>>> Response = <response> <<<NL>>> l2d=<r_l2d> <<<NL>>> Cosim=<r_cosim> <<<NL>> r_l2d_x=<r_l2d_x> <<<NL>>> r_cosim_x=<r_cosim_x>
+    store <resp> Question=<q> <<<NL>>> Response = <response> <<<NL>>> l2d=<r_l2d> <<<NL>>> Cosim=<r_cosim> <<<NL>>> r_l2d_x=<r_l2d_x> <<<NL>>> r_cosim_x=<r_cosim_x>
     ret <resp>
 
     # llm_instance <sysp> instname n_predict=24 temperature=0.5 force=true stream=true
