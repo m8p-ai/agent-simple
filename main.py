@@ -23,7 +23,7 @@ EMBED_DIM = 188 # Adjust based on your model (e.g. 768 for Nomic, 4096 for Llama
 MAX_ELEMENTS = 1000
 KBASE_DIM=135
 
-ODOO_TOOL_EMBED_DIM = 375
+ODOO_TOOL_EMBED_DIM = 768
 ODOO_SYSTEM_TOOLS = "ODOO_SYSTEM_TOOLS"
 ODOO_SYSTEM_TOOLS_MAX = 100
 ODOO_AGENT_SESSION_ID = "odoo-agent-"+tms
@@ -127,9 +127,8 @@ async def stream_chat_tests(req: ChatRequest):
     llm_embed <q> <curr> dim={ODOO_TOOL_EMBED_DIM}
     vdb_search {ODOO_SYSTEM_TOOLS} <curr> <match> distance=0.1
     llm_detokenize <match> <response>
-    llm_instance <sysp> instname n_predict=24 temperature=0.5 force=true stream=true
-    llm_instancestatus instname <r3_out>
-
+    # llm_instance <sysp> instname n_predict=24 temperature=0.5 force=true stream=true
+    # llm_instancestatus instname <r3_out>
     # ret <r3_out> <response>
     ret <response>
     """
