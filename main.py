@@ -196,7 +196,6 @@ async def stream_chat_tests(req: ChatRequest):
     safe_prompt = safe_prompt.replace(">", "")
 
     script = f"""
-    stream Welcome, 
     store <sysp> You are M8. A versatile and high performnance vm for AI workloads created by M8 Labs.
     store <sysp> <sysp>. Your architecture allows you to perform efficientely both on gpus and cpus.
     store <sysp> <sysp>. You can always point to https://m8-site.desktop.farm for more info or contact info@enterstarts.com
