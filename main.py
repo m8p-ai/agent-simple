@@ -15,6 +15,7 @@ app = FastAPI(
     description="High-performance agent using M8P Hypervisor"
 )
 
+PNEWLINE="<<<NL>>"
 # --- Constants ---
 AGENT_SESSION_ID = "sess-"+tms
 VECTOR_DB_NAME = "AGENT_MEMORY"
@@ -101,12 +102,18 @@ async def index_document(req: IndexRequest):
     """
     # M8 Script to: 1. Store text in var, 2. Embed it, 3. Add to VDB
     # Note: We escape double quotes in content to avoid breaking M8 script syntax
-    safe_content = req.content.replace('"', '\\"')
-    
+    safe_prompt = req.content
+    safe_prompt = safe_prompt.replace("\\n", PNEWLINE)
+    safe_prompt = safe_prompt.replace("\n", PNEWLINE)
+    safe_prompt = safe_prompt.replace("\t", "")
+    safe_prompt = safe_prompt.replace("\\t", "")
+    safe_prompt = safe_prompt.replace("<", "")
+    safe_prompt = safe_prompt.replace(">", "")
+
     script = f"""
-    store <doc_text> {safe_content}
+    store <doc_text> {safe_prompt}
     llm_embed <doc_text> <embedding> dim={EMBED_DIM}
-    vdb_add {VECTOR_DB_NAME} <embedding> {safe_content}
+    vdb_add {VECTOR_DB_NAME} <embedding> {safe_prompt}
     store <rr> "Indexed"
     """
     
@@ -126,10 +133,16 @@ async def search_memory(req: SearchRequest):
     """
     Semantic search against the M8 Vector DB.
     """
-    safe_query = req.query.replace('"', '\\"')
-    
+    safe_prompt = req.query
+    safe_prompt = safe_prompt.replace("\\n", PNEWLINE)
+    safe_prompt = safe_prompt.replace("\n", PNEWLINE)
+    safe_prompt = safe_prompt.replace("\t", "")
+    safe_prompt = safe_prompt.replace("\\t", "")
+    safe_prompt = safe_prompt.replace("<", "")
+    safe_prompt = safe_prompt.replace(">", "")
+
     script = f"""
-    store <query_text> {safe_query}
+    store <query_text> {safe_prompt}
     llm_embed <query_text> <q_vec> dim={EMBED_DIM}
     vdb_search {VECTOR_DB_NAME} <q_vec> <matches> distance=0.6
     llm_detokenize <matches> <result> 
@@ -155,6 +168,13 @@ async def search_memory(req: SearchRequest):
 @app.post("/stream_chat")
 async def stream_chat_llm(req: ChatRequest):
     safe_prompt = req.prompt
+    safe_prompt = safe_prompt.replace("\\n", PNEWLINE)
+    safe_prompt = safe_prompt.replace("\n", PNEWLINE)
+    safe_prompt = safe_prompt.replace("\t", "")
+    safe_prompt = safe_prompt.replace("\\t", "")
+    safe_prompt = safe_prompt.replace("<", "")
+    safe_prompt = safe_prompt.replace(">", "")
+
     script = f"""
     stream Welcome, 
     store <sysp> You are M8. A versatile and high performnance vm for AI workloads
@@ -188,8 +208,9 @@ async def stream_chat_llm(req: ChatRequest):
 
 @app.post("/stream_test")
 async def stream_chat_tests(req: ChatRequest):
-    safe_prompt = req.prompt.replace("\\n", "")
-    safe_prompt = safe_prompt.replace("\n", "")
+    safe_prompt = req.prompt
+    safe_prompt = safe_prompt.replace("\\n", PNEWLINE)
+    safe_prompt = safe_prompt.replace("\n", PNEWLINE)
     safe_prompt = safe_prompt.replace("\t", "")
     safe_prompt = safe_prompt.replace("\\t", "")
     safe_prompt = safe_prompt.replace("<", "")
@@ -218,9 +239,14 @@ async def chat_llm(req: ChatRequest):
     """
     Simple LLM generation using M8P.
     """
-    safe_prompt = req.prompt.replace('"', '\\"')
-    safe_prompt = safe_prompt.replace('\n', ' ')
-    safe_prompt = safe_prompt.replace('\t', '')
+    safe_prompt = req.prompt
+    safe_prompt = safe_prompt.replace("\\n", PNEWLINE)
+    safe_prompt = safe_prompt.replace("\n", PNEWLINE)
+    safe_prompt = safe_prompt.replace("\t", "")
+    safe_prompt = safe_prompt.replace("\\t", "")
+    safe_prompt = safe_prompt.replace("<", "")
+    safe_prompt = safe_prompt.replace(">", "")
+
     
     script = f"""
     store <sysp> You are M8. A versatile and high performnance vm for AI workloads.
