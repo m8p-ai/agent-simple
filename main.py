@@ -119,6 +119,34 @@ def init_odoo_agent():
     # EnsureExists calls session-check, creating it if missing
     return M8.EnsureExists(ODOO_AGENT_SESSION_ID, code=INIT_SCRIPT)
 
+@app.post("/odoo-tool-index", response_model=CommandResponse)
+async def index_odoo_tool(req: IndexRequest):
+    """
+    Embeds text and stores it in the M8 Vector DB.
+    """
+    # M8 Script to: 1. Store text in var, 2. Embed it, 3. Add to VDB
+    # Note: We escape double quotes in content to avoid breaking M8 script syntax
+    safe_prompt = sanitize(req.content)
+    tool_mask = sanitize(req.mask)
+
+    script = f"""
+    store <doc_text> {safe_prompt}
+    llm_embed <doc_text> <embedding> dim={ODOO_TOOL_EMBED_DIM}
+    vdb_add {ODOO_SYSTEM_TOOLS} <embedding> {tool_mask}
+    store <rr> Indexed
+    """
+    
+    resp = M8.RunSession(ODOO_AGENT_SESSION_ID, script, timeout=10)
+    
+    if isinstance(resp, dict) and resp.get('Status') != 'OK':
+        raise HTTPException(status_code=500, detail=f"M8 Error: {resp.get('Err')}")
+        
+    return CommandResponse(
+        status="success", 
+        result="Document indexed successfully",
+        telemetry=resp.get('Tms') # Returns the execution latency string
+    )
+
 @app.post("/stream_odoo_v2")
 async def stream_chat_tests(req: ChatRequest):
     safe_prompt = sanitize(req.prompt)
@@ -286,33 +314,7 @@ async def index_document(req: IndexRequest):
     )
 
 
-@app.post("/odoo-tool-index", response_model=CommandResponse)
-async def index_odoo_tool(req: IndexRequest):
-    """
-    Embeds text and stores it in the M8 Vector DB.
-    """
-    # M8 Script to: 1. Store text in var, 2. Embed it, 3. Add to VDB
-    # Note: We escape double quotes in content to avoid breaking M8 script syntax
-    safe_prompt = sanitize(req.content)
-    tool_mask = sanitize(req.mask)
 
-    script = f"""
-    store <doc_text> {safe_prompt}
-    llm_embed <doc_text> <embedding> dim={ODOO_TOOL_EMBED_DIM}
-    vdb_add {ODOO_SYSTEM_TOOLS} <embedding> {tool_mask}
-    store <rr> Indexed
-    """
-    
-    resp = M8.RunSession(AGENT_SESSION_ID, script, timeout=10)
-    
-    if isinstance(resp, dict) and resp.get('Status') != 'OK':
-        raise HTTPException(status_code=500, detail=f"M8 Error: {resp.get('Msg')}")
-        
-    return CommandResponse(
-        status="success", 
-        result="Document indexed successfully",
-        telemetry=resp.get('Tms') # Returns the execution latency string
-    )
 
 @app.post("/search", response_model=CommandResponse)
 async def search_memory(req: SearchRequest):
