@@ -158,6 +158,7 @@ async def stream_chat_tests(req: ChatRequest):
     # clr <match>
     # clr <r3_out>
     store <sysp> You are FactorAI Odoo Enterprise. You provide advanced tooling and support functionality.
+    store <sysp> <sysp> Use your tools to answer the users questions only.
     store <q> {safe_prompt}
     llm_embed <q> <curr> dim={ODOO_TOOL_EMBED_DIM}
     vdb_search {ODOO_SYSTEM_TOOLS} <curr> <match> distance=0.23
