@@ -21,12 +21,19 @@ AGENT_SESSION_ID = "sess-"+tms
 VECTOR_DB_NAME = "AGENT_MEMORY"
 EMBED_DIM = 188 # Adjust based on your model (e.g. 768 for Nomic, 4096 for Llama3/Mistral usually)
 MAX_ELEMENTS = 1000
+TOOL_DIM={ODOO_TOOL_EMBED_DIM}
+KBASE_DIM=135
 
-print("AGENT_SESSION_ID: ", AGENT_SESSION_ID)
+ODOO_TOOL_EMBED_DIM = 175
+ODOO_SYSTEM_TOOLS = "ODOO_SYSTEM_TOOLS"
+ODOO_SYSTEM_TOOLS_MAX = 100
+ODOO_AGENT_SESSION_ID = "odoo-agent-"+tms
+# print("AGENT_SESSION_ID: ", AGENT_SESSION_ID)
 
 # --- Pydantic Models ---
 class IndexRequest(BaseModel):
     content: str
+    mask: str = ""
     metadata: str = ""
 
 class SearchRequest(BaseModel):
@@ -42,6 +49,16 @@ class CommandResponse(BaseModel):
     result: Any = None
     telemetry: Any = None
 
+def sanitize(content):
+    # safe_prompt = content
+    safe_prompt = content.replace("\\n", PNEWLINE)
+    safe_prompt = safe_prompt.replace("\n", PNEWLINE)
+    safe_prompt = safe_prompt.replace("\t", "")
+    safe_prompt = safe_prompt.replace("\\t", "")
+    safe_prompt = safe_prompt.replace("<", "")
+    safe_prompt = safe_prompt.replace(">", "")
+    return safe_prompt
+
 # --- Helper to Initialize Session ---
 def init_agent_memory():
     """
@@ -54,10 +71,93 @@ def init_agent_memory():
     # EnsureExists calls session-check, creating it if missing
     M8.EnsureExists(AGENT_SESSION_ID, code=init_script)
 
+# --- Helper to Initialize Session ---
+def init_odoo_agent():
+    INIT_SCRIPT = """
+    vdb_instance SYSTEM_TOOLS dim={ODOO_TOOL_EMBED_DIM} max_elements=60 M=16 ef_construction=300
+    ## Main Tools
+    store <t1> {"function":"execute_odoo_command","arguments":{"model": "res.partner"}}
+    llm_embed <t1> <n1> dim={ODOO_TOOL_EMBED_DIM}
+    vdb_add SYSTEM_TOOLS <n1> execute_odoo_command[res.partner] - estrutura de campos do modelo res.partner
+
+    store <t1> {"function":"execute_odoo_command","arguments":{"command": "search_read"}}
+    llm_embed <t1> <n1> dim={ODOO_TOOL_EMBED_DIM}
+    vdb_add SYSTEM_TOOLS <n1> execute_odoo_command[search_read]  - lista e filtro de leads/oportunidades 
+
+    store <t1> {"function":"execute_odoo_command","arguments":{"model": "sale.order"}}
+    llm_embed <t1> <n1> dim={ODOO_TOOL_EMBED_DIM}
+    vdb_add SYSTEM_TOOLS <n1> execute_odoo_command[sale.order] - ordem de venda
+
+    store <t1> {"function":"execute_odoo_command","arguments":{"model": "product.template"}}
+    llm_embed <t1> <n1> dim={ODOO_TOOL_EMBED_DIM}
+    vdb_add SYSTEM_TOOLS <n1> execute_odoo_command[product.template] -  lista de preço produtos
+
+    store <t1> {"function":"message_notify_user","arguments":{"title": "Atualizacao de Processo"}}
+    llm_embed <t1> <n1> dim={ODOO_TOOL_EMBED_DIM}
+    vdb_add SYSTEM_TOOLS <n1> message_notify_user[title] - Atualizacao de Processo por email, notificacao, mensagem, chat, lembrete.
+
+    store <t1> {"function":"message_notify_user","arguments":{"websocket": "Atualizacao de Processo via websocket"}}
+    llm_embed <t1> <n1> dim={ODOO_TOOL_EMBED_DIM}
+    vdb_add SYSTEM_TOOLS <n1> message_notify_user[websocket] - Atualizacao de Processo Asyncrono
+
+    store <t1> {"function":"list_available_models","arguments": {"app_filter": "crm"}}
+    llm_embed <t1> <n1> dim={ODOO_TOOL_EMBED_DIM}
+    vdb_add SYSTEM_TOOLS <n1> list_available_models[crm] - modelos relacionados ao CRM
+
+    store <t1> {"function":"execute_odoo_command","arguments": {"model": "crm.lead"}}
+    llm_embed <t1> <n1> dim={ODOO_TOOL_EMBED_DIM}
+    vdb_add SYSTEM_TOOLS <n1> execute_odoo_command[crm.lead] - leads e oportunidades
+    """.format(ODOO_TOOL_EMBED_DIM=ODOO_TOOL_EMBED_DIM)
+
+
+    init_script = f"""
+    vdb_instance {ODOO_SYSTEM_TOOLS} dim={ODOO_TOOL_EMBED_DIM} max_elements={ODOO_SYSTEM_TOOLS_MAX} M=68 ef_construction=200
+    store <r1> Memory Initialized
+    """
+    # EnsureExists calls session-check, creating it if missing
+    return M8.EnsureExists(ODOO_AGENT_SESSION_ID, code=init_script)
+
+@app.post("/stream_odoo")
+async def stream_chat_tests(req: ChatRequest):
+    safe_prompt = sanitize(req.prompt)
+
+    script = f"""
+    store <sysp> You are FactorAI Odoo Enterprise. You provide functionality
+    store <sysp> <sysp>. 
+
+    store <q> {safe_prompt}
+    llm_embed <q> <curr> dim={ODOO_TOOL_EMBED_DIM}
+    vdb_search SYSTEM_TOOLS <curr> <match> distance=0.1
+    llm_detokenize <match> <response>
+
+    # stream Begining processing...
+    # stall 0.05
+    #llm_openai <input> instname n_predict=78 temperature=0.1 force=true stream=true
+    #llm_openai <input> instname n_predict=78 temperature=0.1 force=true stream=true
+    #llm_openai <input> instname n_predict=78 temperature=0.1 force=true stream=true
+    #llm_instancestatus instname <r3_out>
+    """
+
+    return StreamingResponse(
+        M8.StreamSession(AGENT_SESSION_ID, script),
+        media_type="text/plain"
+    )
+
+
 @app.on_event("startup")
 async def startup_event():
-    print(f"Booting Agent Session: [{AGENT_SESSION_ID}]")
-    init_agent_memory()
+
+    try:
+        print(f"Booting Agent : [{AGENT_SESSION_ID}]")
+        init_agent_memory()
+    except Exception as e:
+        print("FAILED TO INIT ODOO AGENT:: ", e)
+
+    try:
+        print(f"Booting Odoo-Agent : [{ODOO_AGENT_SESSION_ID}]")
+        init_odoo_agent()
+    except Exception as e:
+        print("FAILED TO INIT ODOO AGENT:: ", e)
 
 @app.get("/", response_class=HTMLResponse)
 async def read_root():
@@ -115,6 +215,37 @@ async def index_document(req: IndexRequest):
     llm_embed <doc_text> <embedding> dim={EMBED_DIM}
     vdb_add {VECTOR_DB_NAME} <embedding> {safe_prompt}
     store <rr> "Indexed"
+    """
+    
+    resp = M8.RunSession(AGENT_SESSION_ID, script, timeout=10)
+    
+    if isinstance(resp, dict) and resp.get('Status') != 'OK':
+        raise HTTPException(status_code=500, detail=f"M8 Error: {resp.get('Msg')}")
+        
+    return CommandResponse(
+        status="success", 
+        result="Document indexed successfully",
+        telemetry=resp.get('Tms') # Returns the execution latency string
+    )
+
+
+
+
+@app.post("/odoo-tool-index", response_model=CommandResponse)
+async def index_odoo_tool(req: IndexRequest):
+    """
+    Embeds text and stores it in the M8 Vector DB.
+    """
+    # M8 Script to: 1. Store text in var, 2. Embed it, 3. Add to VDB
+    # Note: We escape double quotes in content to avoid breaking M8 script syntax
+    safe_prompt = sanitize(req.content)
+    tool_mask = sanitize(req.mask)
+
+    script = f"""
+    store <doc_text> {safe_prompt}
+    llm_embed <doc_text> <embedding> dim={ODOO_TOOL_EMBED_DIM}
+    vdb_add {VECTOR_DB_NAME} <embedding> {tool_mask}
+    store <rr> Indexed
     """
     
     resp = M8.RunSession(AGENT_SESSION_ID, script, timeout=10)
@@ -207,6 +338,37 @@ async def stream_chat_llm(req: ChatRequest):
     )
 
 @app.post("/stream_test")
+async def stream_chat_tests(req: ChatRequest):
+    safe_prompt = req.prompt
+    safe_prompt = safe_prompt.replace("\\n", PNEWLINE)
+    safe_prompt = safe_prompt.replace("\n", PNEWLINE)
+    safe_prompt = safe_prompt.replace("\t", "")
+    safe_prompt = safe_prompt.replace("\\t", "")
+    safe_prompt = safe_prompt.replace("<", "")
+    safe_prompt = safe_prompt.replace(">", "")
+
+    script = f"""
+    store <sysp> You are M8. A versatile and high performnance vm for AI workloads created by M8 Labs.
+    store <sysp> <sysp>. Your architecture allows you to perform efficientely both on gpus and cpus.
+    store <sysp> <sysp>. You can always point to https://m8-site.desktop.farm for more info or contact info@enterstarts.com
+    store <sysp> <sysp>. The tasks you can help with are: Tool-Execution, Get-Weather and GetStockPrice
+
+    store <q> {safe_prompt}
+    store <input> <sysp>User: <q>; Your Response: 
+    # stream Begining processing...
+    # stall 0.05
+    llm_openai <input> instname n_predict=78 temperature=0.1 force=true stream=true
+    llm_openai <input> instname n_predict=78 temperature=0.1 force=true stream=true
+    llm_openai <input> instname n_predict=78 temperature=0.1 force=true stream=true
+    llm_instancestatus instname <r3_out>
+    """
+
+    return StreamingResponse(
+        M8.StreamSession(AGENT_SESSION_ID, script),
+        media_type="text/plain"
+    )
+
+@app.post("/stream_odoo")
 async def stream_chat_tests(req: ChatRequest):
     safe_prompt = req.prompt
     safe_prompt = safe_prompt.replace("\\n", PNEWLINE)
