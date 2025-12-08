@@ -188,7 +188,13 @@ async def stream_chat_llm(req: ChatRequest):
 
 @app.post("/stream_test")
 async def stream_chat_tests(req: ChatRequest):
-    safe_prompt = req.prompt
+    safe_prompt = req.prompt.replace("\\n", "")
+    safe_prompt = safe_prompt.replace("\n", "")
+    safe_prompt = safe_prompt.replace("\t", "")
+    safe_prompt = safe_prompt.replace("\\t", "")
+    safe_prompt = safe_prompt.replace("<", "")
+    safe_prompt = safe_prompt.replace(">", "")
+
     script = f"""
     stream Welcome, 
     store <sysp> You are M8. A versatile and high performnance vm for AI workloads
