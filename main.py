@@ -102,7 +102,7 @@ def init_odoo_agent():
 
     store <t1> Notificacao de utilizadores por email, notificacao, mensagem, chat, lembrete. {"function":"message_notify_user","arguments":{"title": "Notificar"}}
     llm_embed <t1> <n1> dim={ODOO_TOOL_EMBED_DIM}
-    vdb_add {ODOO_SYSTEM_TOOLS} <n1> message_notify_user[title] - Atualizacao de Processo por email, notificacao, mensagem, chat, lembrete.
+    vdb_add {ODOO_SYSTEM_TOOLS} <n1> message_notify_user[title] -Notificacao de utilizador
 
     store <t1> Atualizacao de Processo Asyncrono {"function":"message_notify_user","arguments":{"websocket": "Atualizacao de Processo via websocket"}}
     llm_embed <t1> <n1> dim={ODOO_TOOL_EMBED_DIM}
