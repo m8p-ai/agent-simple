@@ -23,7 +23,8 @@ EMBED_DIM = 188 # Adjust based on your model (e.g. 768 for Nomic, 4096 for Llama
 MAX_ELEMENTS = 1000
 KBASE_DIM=135
 
-ODOO_TOOL_EMBED_DIM = 468
+# ODOO_TOOL_EMBED_DIM = 468
+ODOO_TOOL_EMBED_DIM = 185
 ODOO_SYSTEM_TOOLS = "ODOO_SYSTEM_TOOLS"
 ODOO_SYSTEM_TOOLS_MAX = 100
 ODOO_AGENT_SESSION_ID = "odoo-agent-"+tms
@@ -71,9 +72,11 @@ def init_agent_memory():
     M8.EnsureExists(AGENT_SESSION_ID, code=init_script)
 
 # --- Helper to Initialize Session ---
+# max_elements=6000 M=149 ef_construction=300
 def init_odoo_agent():
     INIT_SCRIPT = """
-    vdb_instance {ODOO_SYSTEM_TOOLS} dim={ODOO_TOOL_EMBED_DIM} max_elements=60 M=98 ef_construction=300
+    # vdb_instance {ODOO_SYSTEM_TOOLS} dim={ODOO_TOOL_EMBED_DIM} max_elements=60 M=98 ef_construction=300
+    vdb_instance {ODOO_SYSTEM_TOOLS} dim={ODOO_TOOL_EMBED_DIM} max_elements=500 M=149 ef_construction=300
     ## Main Tools
     store <t1> {"function":"execute_odoo_command","arguments":{"model": "res.partner"}} - estrutura de campos do modelo res.partner
     llm_embed <t1> <n1> dim={ODOO_TOOL_EMBED_DIM}
