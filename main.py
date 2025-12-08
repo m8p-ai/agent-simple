@@ -140,9 +140,9 @@ async def stream_chat_tests(req: ChatRequest):
     #llm_openai <input> instname n_predict=78 temperature=0.1 force=true stream=true
     
     resp = M8.RunSession(ODOO_AGENT_SESSION_ID, script, timeout=30)
-    
+    print("RESP: ", resp)
     if isinstance(resp, dict) and resp.get('Status') != 'OK':
-        raise HTTPException(status_code=500, detail=f"M8 Error: {resp.get('Msg')}")
+        raise HTTPException(status_code=500, detail=f"M8 Error: {resp.get('Err', resp.get('R'))}")
 
     return CommandResponse(
         status="success",
