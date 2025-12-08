@@ -183,7 +183,7 @@ async def stream_chat_tests(req: ChatRequest):
     if isinstance(resp, dict) and resp.get('Status') != 'OK':
         raise HTTPException(status_code=500, detail=f"M8 Error: {resp.get('Err', resp.get('R'))}")
 
-    # buffer = resp.get('R', '')
+    buffer = resp.get('R', '')
 
     return CommandResponse(
         status="success",
