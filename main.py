@@ -197,9 +197,8 @@ async def stream_chat_tests(req: ChatRequest):
 
     stream Begining processing...
     stall 0.05
-    llm_openai <input> instname n_predict=25 temperature=0.1 force=true stream=true
+    llm_openai <input> instname n_predict=-1 temperature=0.1 force=true stream=true
     llm_instancestatus instname <r3_out>
-    # stream Response1 IS DONE.
     """
     return StreamingResponse(
         M8.StreamSession(AGENT_SESSION_ID, script),
