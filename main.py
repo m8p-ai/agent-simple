@@ -125,7 +125,7 @@ async def stream_chat_tests(req: ChatRequest):
     store <sysp> <sysp>. 
     store <q> {safe_prompt}
     llm_embed <q> <curr> dim={ODOO_TOOL_EMBED_DIM}
-    vdb_search {ODOO_SYSTEM_TOOLS} <curr> <match> distance=0.4
+    vdb_search {ODOO_SYSTEM_TOOLS} <curr> <match> distance=0.6
     llm_detokenize <match> <response>
     # llm_instance <sysp> instname n_predict=24 temperature=0.5 force=true stream=true
     # llm_instancestatus instname <r3_out>
