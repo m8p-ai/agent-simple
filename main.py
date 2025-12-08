@@ -116,7 +116,7 @@ def init_odoo_agent():
     # EnsureExists calls session-check, creating it if missing
     return M8.EnsureExists(ODOO_AGENT_SESSION_ID, code=INIT_SCRIPT)
 
-@app.post("/stream_odoo")
+@app.post("/stream_odoo_v2")
 async def stream_chat_tests(req: ChatRequest):
     safe_prompt = sanitize(req.prompt)
 
@@ -412,36 +412,36 @@ async def stream_chat_tests(req: ChatRequest):
         media_type="text/plain"
     )
 
-# @app.post("/stream_odoo")
-# async def stream_chat_tests(req: ChatRequest):
-#     safe_prompt = req.prompt
-#     safe_prompt = safe_prompt.replace("\\n", PNEWLINE)
-#     safe_prompt = safe_prompt.replace("\n", PNEWLINE)
-#     safe_prompt = safe_prompt.replace("\t", "")
-#     safe_prompt = safe_prompt.replace("\\t", "")
-#     safe_prompt = safe_prompt.replace("<", "")
-#     safe_prompt = safe_prompt.replace(">", "")
+@app.post("/stream_odoo")
+async def stream_chat_tests(req: ChatRequest):
+    safe_prompt = req.prompt
+    safe_prompt = safe_prompt.replace("\\n", PNEWLINE)
+    safe_prompt = safe_prompt.replace("\n", PNEWLINE)
+    safe_prompt = safe_prompt.replace("\t", "")
+    safe_prompt = safe_prompt.replace("\\t", "")
+    safe_prompt = safe_prompt.replace("<", "")
+    safe_prompt = safe_prompt.replace(">", "")
 
-#     script = f"""
-#     store <sysp> You are M8. A versatile and high performnance vm for AI workloads created by M8 Labs.
-#     store <sysp> <sysp>. Your architecture allows you to perform efficientely both on gpus and cpus.
-#     store <sysp> <sysp>. You can always point to https://m8-site.desktop.farm for more info or contact info@enterstarts.com
-#     store <sysp> <sysp>. The tasks you can help with are: Tool-Execution, Get-Weather and GetStockPrice
+    script = f"""
+    store <sysp> You are M8. A versatile and high performnance vm for AI workloads created by M8 Labs.
+    store <sysp> <sysp>. Your architecture allows you to perform efficientely both on gpus and cpus.
+    store <sysp> <sysp>. You can always point to https://m8-site.desktop.farm for more info or contact info@enterstarts.com
+    store <sysp> <sysp>. The tasks you can help with are: Tool-Execution, Get-Weather and GetStockPrice
 
-#     store <q> {safe_prompt}
-#     store <input> <sysp>User: <q>; Your Response: 
-#     # stream Begining processing...
-#     # stall 0.05
-#     llm_openai <input> instname n_predict=78 temperature=0.1 force=true stream=true
-#     llm_openai <input> instname n_predict=78 temperature=0.1 force=true stream=true
-#     llm_openai <input> instname n_predict=78 temperature=0.1 force=true stream=true
-#     llm_instancestatus instname <r3_out>
-#     """
+    store <q> {safe_prompt}
+    store <input> <sysp>User: <q>; Your Response: 
+    # stream Begining processing...
+    # stall 0.05
+    llm_openai <input> instname n_predict=78 temperature=0.1 force=true stream=true
+    llm_openai <input> instname n_predict=78 temperature=0.1 force=true stream=true
+    llm_openai <input> instname n_predict=78 temperature=0.1 force=true stream=true
+    llm_instancestatus instname <r3_out>
+    """
 
-#     return StreamingResponse(
-#         M8.StreamSession(AGENT_SESSION_ID, script),
-#         media_type="text/plain"
-#     )
+    return StreamingResponse(
+        M8.StreamSession(AGENT_SESSION_ID, script),
+        media_type="text/plain"
+    )
 
 @app.post("/chat", response_model=CommandResponse)
 async def chat_llm(req: ChatRequest):

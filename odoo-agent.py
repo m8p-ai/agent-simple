@@ -39,8 +39,6 @@ store <q> Preciso de ver a estrutura de campos do modelo 'res.partner' para veri
 llm_embed <q> <curr> dim=198
 vdb_search SYSTEM_TOOLS <curr> <match> distance=0.001
 llm_detokenize <match> <response>
-
-
 """
 
 @app.post("/stream_odoo")
@@ -58,6 +56,12 @@ async def stream_chat_tests(req: ChatRequest):
     store <sysp> <sysp>. Your architecture allows you to perform efficientely both on gpus and cpus.
     store <sysp> <sysp>. You can always point to https://m8-site.desktop.farm for more info or contact info@enterstarts.com
     store <sysp> <sysp>. The tasks you can help with are: Tool-Execution, Get-Weather and GetStockPrice
+
+    store <q> Preciso de ver a estrutura de campos do modelo 'res.partner' para verificar se o telefone é obrigatório.
+    llm_embed <q> <curr> dim={ODOO_TOOL_EMBED_DIM}
+    vdb_search SYSTEM_TOOLS <curr> <match> distance=0.001
+    llm_detokenize <match> <response>
+
 
     store <q> {safe_prompt}
     store <input> <sysp>User: <q>; Your Response: 
