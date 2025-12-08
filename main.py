@@ -110,8 +110,8 @@ def init_odoo_agent():
     store <r1> Memory Initialized
     """
 
-    INIT_SCRIPT = INIT_SCRIPT.replace("{ODOO_TOOL_EMBED_DIM}", ODOO_TOOL_EMBED_DIM)
-    INIT_SCRIPT = INIT_SCRIPT.replace("{ODOO_SYSTEM_TOOLS}", ODOO_SYSTEM_TOOLS)
+    INIT_SCRIPT = INIT_SCRIPT.replace("{ODOO_TOOL_EMBED_DIM}", str(ODOO_TOOL_EMBED_DIM))
+    INIT_SCRIPT = INIT_SCRIPT.replace("{ODOO_SYSTEM_TOOLS}", str(ODOO_SYSTEM_TOOLS))
 
     # EnsureExists calls session-check, creating it if missing
     return M8.EnsureExists(ODOO_AGENT_SESSION_ID, code=INIT_SCRIPT)
