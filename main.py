@@ -128,6 +128,7 @@ async def stream_chat_tests(req: ChatRequest):
     llm_embed <q> <curr> dim={ODOO_TOOL_EMBED_DIM}
     vdb_search {ODOO_SYSTEM_TOOLS} <curr> <match> distance=0.1
     llm_detokenize <match> <response>
+    stream <response>
 
     # stream Begining processing...
     # stall 0.05
