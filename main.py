@@ -203,10 +203,9 @@ async def stream_chat_tests(req: ChatRequest):
     store <sysp> <sysp>. The tasks you can help with are: Tool-Execution, Get-Weather and GetStockPrice
 
     store <q> {safe_prompt}
-
     store <input> <sysp>User: <q>; Your Response: 
-    stream Begining processing...
-    stall 0.05
+    # stream Begining processing...
+    # stall 0.05
     llm_openai <input> instname n_predict=78 temperature=0.1 force=true stream=true
     llm_instancestatus instname <r3_out>
     """
