@@ -170,7 +170,7 @@ async def stream_chat_tests(req: ChatRequest):
     store <prompt> <sysp><<<NL>>>Question=<q><<<NL>>>Your answer:
     llm_openai <prompt> instname n_predict=75 temperature=0 force=true stream=false tools=<rtools>
     llm_instancestatus instname <r3_out>
-    store <out> <r3_out> <<<NL>>> VectorCall: <response>
+    ret <r3_out> <response>
     """
 
     # stream <response>
