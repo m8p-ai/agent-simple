@@ -154,10 +154,10 @@ async def stream_chat_tests(req: ChatRequest):
     safe_prompt = sanitize(req.prompt)
 
     script = f"""
-    clr <q>
-    clr <curr>
-    clr <match>
-    clr <r3_out>
+    # clr <q>
+    # clr <curr>
+    # clr <match>
+    # clr <r3_out>
     store <sysp> You are FactorAI Odoo Enterprise. You provide functionality
     store <sysp> <sysp>. 
     store <q> {safe_prompt}
