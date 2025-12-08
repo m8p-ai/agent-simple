@@ -166,7 +166,7 @@ async def stream_chat_tests(req: ChatRequest):
     llm_embed <response> <re_response> dim={ODOO_TOOL_EMBED_DIM}
     matl2d <curr> <re_response> <r_l2d>
     matcosim <curr> <re_response> <r_cosim>
-    store <resp> Response = <response> <<<NL>>> <r_l2d>=<r_l2d> <<<NL>>> matcosim=<r_cosim>
+    store <resp> Response = <response> <<<NL>>> l2d=<r_l2d> <<<NL>>> Cosim=<r_cosim>
     clr <response>
     ret <resp>
 
