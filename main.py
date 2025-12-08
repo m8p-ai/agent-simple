@@ -157,7 +157,7 @@ async def stream_chat_tests(req: ChatRequest):
     # clr <curr>
     # clr <match>
     # clr <r3_out>
-    store <sysp> You are FactorAI Odoo Enterprise. You provide advanced tooling and support functionality. Use your tools only to answer the questions.
+    store <sysp> You are a Helpful Assistant. You provide advanced tooling and support functionality. Use your tools only to answer the questions.
     store <q> {safe_prompt}
     llm_embed <q> <curr> dim={ODOO_TOOL_EMBED_DIM}
     vdb_search {ODOO_SYSTEM_TOOLS} <curr> <match> distance=0.23
@@ -170,7 +170,7 @@ async def stream_chat_tests(req: ChatRequest):
     store <prompt> <sysp><<<NL>>>Question=<q><<<NL>>>Your answer:
     llm_openai <prompt> instname n_predict=75 temperature=0 force=true stream=false tools=<rtools>
     llm_instancestatus instname <r3_out>
-    ret <r3_out> <response>
+    store <out> <r3_out> <<<NL>>> VectorCall: <response>
     """
 
     # stream <response>
