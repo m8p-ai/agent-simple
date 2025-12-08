@@ -155,7 +155,7 @@ async def stream_chat_tests(req: ChatRequest):
     clr <q>
     clr <curr>
     clr <match>
-    clr <response>
+    # clr <response>
     clr <r3_out>
     store <sysp> You are FactorAI Odoo Enterprise. You provide functionality
     store <sysp> <sysp>. 
