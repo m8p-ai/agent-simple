@@ -430,11 +430,11 @@ async def stream_chat_tests(req: ChatRequest):
 
     store <q> {safe_prompt}
     store <input> <sysp>User: <q>; Your Response: 
-    # stream Begining processing...
-    # stall 0.05
+    stream Begining processing...
+    stall 0.05
     llm_openai <input> instname n_predict=78 temperature=0.1 force=true stream=true
-    llm_openai <input> instname n_predict=78 temperature=0.1 force=true stream=true
-    llm_openai <input> instname n_predict=78 temperature=0.1 force=true stream=true
+    # llm_openai <input> instname n_predict=78 temperature=0.1 force=true stream=true
+    # llm_openai <input> instname n_predict=78 temperature=0.1 force=true stream=true
     llm_instancestatus instname <r3_out>
     """
 
