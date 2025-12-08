@@ -164,6 +164,7 @@ async def stream_chat_tests(req: ChatRequest):
     vdb_search {ODOO_SYSTEM_TOOLS} <curr> <match> distance=0.32
     llm_detokenize <match> <response>
     store <r33> ""<response>""
+    return <r33>
 
     llm_embed <response> <re_response> dim={ODOO_TOOL_EMBED_DIM}
     matl2d <curr> <re_response> <r_l2d>
