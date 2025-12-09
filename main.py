@@ -213,18 +213,24 @@ async def stream_chat_tests(req: ChatRequest):
                 opx = opx.replace(" ] ", "]")
                 opx = opx.replace(" [ ", "[")
                 opx = opx.replace(" - ", "-")
-            vector_q = opx
+                vector_q = opx
+                print("vector_q: ", vector_q)
 
-        try:
-            tool_result = execute_tool(vector_q, params=[])
+                try:
+                    tool_result = execute_tool(vector_q, params=[])
+                    stream_script = f"""
+                    stream {tool_result}
+                    """
+                except Exception as e:
+                    stream_script = f"""
+                    stream An error ocurred, can you try again
+                    """
+                    print("FAILED TO EXECUTE TOOL: ", e)
+
+        else:
             stream_script = f"""
-            stream {tool_result}
+            stream {buffer}
             """
-        except Exception as e:
-            stream_script = f"""
-            stream An error ocurred, can you try again
-            """
-            print("FAILED TO EXECUTE TOOL: ", e)
 
     return StreamingResponse(
         M8.StreamSession(ODOO_AGENT_SESSION_ID, stream_script),
