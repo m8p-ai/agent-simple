@@ -483,14 +483,14 @@ async def search_memory(req: SearchRequest):
     safe_prompt = safe_prompt.replace(">", "")
 
     script = f"""
-    store <query_text> {safe_prompt}
-    llm_embed <query_text> <q_vec> dim={EMBED_DIM}
-    vdb_search {VECTOR_DB_NAME} <q_vec> <matches> distance=0.6
-    llm_detokenize <matches> <result> 
-    return <result>
+    store <q> {safe_prompt}
+    llm_embed <q> <curr> dim={ODOO_TOOL_EMBED_DIM}
+    vdb_search {ODOO_SYSTEM_TOOLS} <curr> <match> distance=0.23
+    llm_detokenize <match> <response>
+    return <response>
     """
     
-    resp = M8.RunSession(AGENT_SESSION_ID, script, timeout=5)
+    resp = M8.RunSession(ODOO_AGENT_SESSION_ID, script, timeout=5)
     
     if isinstance(resp, dict) and resp.get('Status') != 'OK':
         raise HTTPException(status_code=500, detail=f"M8 Error: {resp.get('Msg')}")
