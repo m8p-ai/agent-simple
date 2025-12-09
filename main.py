@@ -221,9 +221,9 @@ async def stream_chat_tests(req: ChatRequest):
                 try:
                     tool_result = execute_tool(vector_q, params=[])
                     stream_script = f"""
-                    stream Executando tool {vector_q}<<<NL>>>
+                    stream Executando tool {vector_q}  <<<NL>>>
                     stall 0.22 
-                    stream {tool_result}<<<NL>>>
+                    stream {tool_result}  <<<NL>>>
                     stall 0.002
                     stream Terminado...
                     """
