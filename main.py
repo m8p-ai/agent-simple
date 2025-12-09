@@ -7,6 +7,7 @@ from typing import Any
 import uuid
 import os
 from datetime import datetime
+from tooling import execute_tool
 
 tms = datetime.utcnow().strftime('%Y-%m-%dT%H:%M:%S')
 
@@ -214,9 +215,16 @@ async def stream_chat_tests(req: ChatRequest):
                 opx = opx.replace(" - ", "-")
             vector_q = opx
 
-        stream_script = f"""
-        stream {vector_q}
-        """
+        try:
+            tool_result = execute_tool(vector_q, params=[])
+            stream_script = f"""
+            stream {tool_result}
+            """
+        except Exception as e:
+            stream_script = f"""
+            stream An error ocurred, can you try again
+            """
+            print("FAILED TO EXECUTE TOOL: ", e)
 
     return StreamingResponse(
         M8.StreamSession(ODOO_AGENT_SESSION_ID, stream_script),
