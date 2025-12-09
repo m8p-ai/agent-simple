@@ -252,19 +252,29 @@ async def thinking_odoo(req: ChatRequest):
         telemetry=resp.get('Tms')
     )
 
-@app.post("/execute_odoo")
+@app.post("/execute_odoo_v2")
 async def execute_chat_odoo(req: ChatRequest):
     safe_prompt = sanitize(req.prompt)
 
     script = f"""
-    store <sysp> You are FactorAI Odoo Enterprise. You provide functionality
-    store <sysp> <sysp>. 
+    # clr <q>
+    # clr <curr>
+    # clr <match>
+    # clr <r3_out>
+    store <sysp> You are a Helpful Assistant. You provide advanced tooling and support functionality. Use your tools only to answer the questions.
     store <q> {safe_prompt}
     llm_embed <q> <curr> dim={ODOO_TOOL_EMBED_DIM}
-    vdb_search {ODOO_SYSTEM_TOOLS} <curr> <match> distance=0.1
+    vdb_search {ODOO_SYSTEM_TOOLS} <curr> <match> distance=0.23
     llm_detokenize <match> <response>
-    llm_instance <input> instname n_predict=24 temperature=0.5 force=true 
-    llm_instancestatus instname <r3_out>
+
+    llm_embed <response> <re_response> dim={ODOO_TOOL_EMBED_DIM}
+    matl2d <curr> <re_response> <r_l2d>
+    matcosim <curr> <re_response> <r_cosim>
+    store <resp> Question=<q> <<<NL>>> Response = <response> <<<NL>>> l2d=<r_l2d> <<<NL>>> Cosim=<r_cosim> <<<NL>>> Dimension={ODOO_TOOL_EMBED_DIM}
+    store <prompt> <sysp><<<NL>>>Question=<q><<<NL>>>Your answer
+    #llm_openai <prompt> instname n_predict=75 temperature=0 force=true stream=false tools=<rtools>
+    #llm_instancestatus instname <r3_out>
+    ret <prompt> <response>
     """
 
     # stream <response>
@@ -276,20 +286,62 @@ async def execute_chat_odoo(req: ChatRequest):
     #llm_openai <input> instname n_predict=78 temperature=0.1 force=true stream=true
     
     resp = M8.RunSession(ODOO_AGENT_SESSION_ID, script, timeout=30)
-    
+    # print("RESP: ", resp)
     if isinstance(resp, dict) and resp.get('Status') != 'OK':
-        raise HTTPException(status_code=500, detail=f"M8 Error: {resp.get('Msg')}")
+        raise HTTPException(status_code=500, detail=f"M8 Error: {resp.get('Err', resp.get('R'))}")
+
+    buffer = resp.get('R', '')
+    if isinstance(buffer,list) and len(buffer)==2:
+        opx = buffer[1]
+        if ' _ ' in opx and ' [ ' in opx:
+            opx = opx.replace(" _ ", "_")
+            opx = opx.replace(" . ", ".")
+            opx = opx.replace(" ] ", "]")
+            opx = opx.replace(" [ ", "[")
+            opx = opx.replace(" - ", "-")
+        buffer[1] = opx
 
     return CommandResponse(
         status="success",
-        result=resp.get('R'),
+        result=buffer,
         telemetry=resp.get('Tms')
     )
+    # safe_prompt = sanitize(req.prompt)
 
-    # return StreamingResponse(
-    #     M8.StreamSession(AGENT_SESSION_ID, script),
-    #     media_type="text/plain"
+    # script = f"""
+    # store <sysp> You are FactorAI Odoo Enterprise. You provide functionality
+    # store <sysp> <sysp>. 
+    # store <q> {safe_prompt}
+    # llm_embed <q> <curr> dim={ODOO_TOOL_EMBED_DIM}
+    # vdb_search {ODOO_SYSTEM_TOOLS} <curr> <match> distance=0.1
+    # llm_detokenize <match> <response>
+    # llm_instance <input> instname n_predict=24 temperature=0.5 force=true 
+    # llm_instancestatus instname <r3_out>
+    # """
+
+    # # stream <response>
+    # # stream Begining processing...
+    # # stall 0.05
+    # # llm_openai <sysp> instname n_predict=78 temperature=0.1 force=true stream=true
+    # # llm_instancestatus instname <r3_out>
+    # #llm_openai <input> instname n_predict=78 temperature=0.1 force=true stream=true
+    # #llm_openai <input> instname n_predict=78 temperature=0.1 force=true stream=true
+    
+    # resp = M8.RunSession(ODOO_AGENT_SESSION_ID, script, timeout=30)
+    
+    # if isinstance(resp, dict) and resp.get('Status') != 'OK':
+    #     raise HTTPException(status_code=500, detail=f"M8 Error: {resp.get('Msg')}")
+
+    # return CommandResponse(
+    #     status="success",
+    #     result=resp.get('R'),
+    #     telemetry=resp.get('Tms')
     # )
+
+    # # return StreamingResponse(
+    # #     M8.StreamSession(AGENT_SESSION_ID, script),
+    # #     media_type="text/plain"
+    # # )
 
 
 @app.on_event("startup")
