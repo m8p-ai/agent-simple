@@ -147,8 +147,9 @@ MAP = {
 
 def execute_tool(name, params=None):
     ## GENERATE: Simple fetcher to return the fixtures based on key
-    if name in MAP and 'list' in MAP[name]:
-        return MAP[name]['list']
+    if name in MAP:
+        return MAP[name]
+
     return []
 
 MAP_RULES = {

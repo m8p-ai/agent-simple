@@ -214,9 +214,9 @@ async def stream_chat_tests(req: ChatRequest):
                 opx = opx.replace(" ] ", "]")
                 opx = opx.replace(" [ ", "[")
                 opx = opx.replace(" - ", "-")
-                vector_q = opx
+                vector_q = opx.strip()
                 buffer[1] = vector_q
-                print("vector_q: ", vector_q)
+                print(f"vector_q: [{vector_q}]",)
 
                 try:
                     tool_result = execute_tool(vector_q, params=[])
