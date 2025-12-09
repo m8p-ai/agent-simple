@@ -196,6 +196,7 @@ async def stream_chat_tests(req: ChatRequest):
         opx = buffer[1]
         if ' _ ' in opx and ' [ ' in opx:
             opx = opx.replace(" _ ", "_")
+            opx = opx.replace(" . ", ".")
             opx = opx.replace(" ] ", "]")
             opx = opx.replace(" [ ", "[")
             opx = opx.replace(" - ", "-")
