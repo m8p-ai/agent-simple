@@ -192,7 +192,10 @@ async def stream_chat_tests(req: ChatRequest):
         raise HTTPException(status_code=500, detail=f"M8 Error: {resp.get('Err', resp.get('R'))}")
 
     buffer = resp.get('R', '')
+    vector_q = buffer
+    genai = buffer
     if isinstance(buffer,list) and len(buffer)==2:
+        genai = buffer[0]
         opx = buffer[1]
         if ' _ ' in opx and ' [ ' in opx:
             opx = opx.replace(" _ ", "_")
@@ -201,9 +204,12 @@ async def stream_chat_tests(req: ChatRequest):
             opx = opx.replace(" [ ", "[")
             opx = opx.replace(" - ", "-")
         buffer[1] = opx
+        vector_q = opx
 
     stream_script = f"""
-    stream {buffer}
+    stream {genai}
+    stall 0.0023
+    stream {vector_q}
     """
 
     return StreamingResponse(
