@@ -187,39 +187,41 @@ async def stream_chat_tests(req: ChatRequest):
     #llm_openai <input> instname n_predict=78 temperature=0.1 force=true stream=true
     
     resp = M8.RunSession(ODOO_AGENT_SESSION_ID, script, timeout=30)
+    stream_script = ""
     print("RESP: ", resp)
 
     if isinstance(resp, dict) and resp.get('Status') != 'OK':
-        raise HTTPException(status_code=500, detail=f"M8 Error: {resp.get('Err', resp.get('R'))}")
+        error = resp.get('Error')
+        if 'INVALID_REGISTER[<match>]' in error: ## Low certainty abort operation
+            stream_script = f"""
+            stream Baixa taixa de certeza. Abortando operacao
+            """
+        else:
+            raise HTTPException(status_code=500, detail=f"Oops, parece que cometi um erro. Detalhes {error}")
+    else:
+        buffer = resp.get('R', '')
+        vector_q = buffer
+        genai = buffer
+        print("BUFFER: ", buffer)
+        if isinstance(buffer,list) and len(buffer)==2:
+            genai = buffer[0]
+            opx = buffer[1]
+            if ' _ ' in opx and ' [ ' in opx:
+                opx = opx.replace(" _ ", "_")
+                opx = opx.replace(" . ", ".")
+                opx = opx.replace(" ] ", "]")
+                opx = opx.replace(" [ ", "[")
+                opx = opx.replace(" - ", "-")
+            vector_q = opx
 
-    buffer = resp.get('R', '')
-    vector_q = buffer
-    genai = buffer
-    print("BUFFER: ", buffer)
-    if isinstance(buffer,list) and len(buffer)==2:
-        genai = buffer[0]
-        opx = buffer[1]
-        if ' _ ' in opx and ' [ ' in opx:
-            opx = opx.replace(" _ ", "_")
-            opx = opx.replace(" . ", ".")
-            opx = opx.replace(" ] ", "]")
-            opx = opx.replace(" [ ", "[")
-            opx = opx.replace(" - ", "-")
-        vector_q = opx
-
-    stream_script = f"""
-    stream {vector_q}
-    """
+        stream_script = f"""
+        stream {vector_q}
+        """
 
     return StreamingResponse(
         M8.StreamSession(ODOO_AGENT_SESSION_ID, stream_script),
         media_type="text/plain"
     )
-    # return CommandResponse(
-    #     status="success",
-    #     result=buffer,
-    #     telemetry=resp.get('Tms')
-    # )
 
 @app.post("/thinking_odoo")
 async def thinking_odoo(req: ChatRequest):
