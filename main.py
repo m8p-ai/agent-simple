@@ -221,10 +221,12 @@ async def stream_chat_tests(req: ChatRequest):
 
                 try:
                     tool_result = execute_tool(vector_q, params=[])
+                    trs = sanitize(json.dumps(tool_result))
+                    print("trs: ", trs)
                     stream_script = f"""
                     stream tool-execute {vector_q} 
                     stall 1.42 
-                    stream tool-result {vector_q} ## {sanitize(json.dumps(tool_result))} 
+                    stream tool-result {trs} 
                     stall 2.62
                     stream tool-finish {vector_q} 
                     """
