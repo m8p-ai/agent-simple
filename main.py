@@ -202,11 +202,19 @@ async def stream_chat_tests(req: ChatRequest):
             opx = opx.replace(" - ", "-")
         buffer[1] = opx
 
-    return CommandResponse(
-        status="success",
-        result=buffer,
-        telemetry=resp.get('Tms')
+    stream_script = f"""
+    stream {buffer}
+    """
+
+    return StreamingResponse(
+        M8.StreamSession(ODOO_AGENT_SESSION_ID, stream_script),
+        media_type="text/plain"
     )
+    # return CommandResponse(
+    #     status="success",
+    #     result=buffer,
+    #     telemetry=resp.get('Tms')
+    # )
 
 @app.post("/thinking_odoo")
 async def thinking_odoo(req: ChatRequest):
