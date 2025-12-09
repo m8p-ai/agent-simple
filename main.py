@@ -203,7 +203,7 @@ async def stream_chat_tests(req: ChatRequest):
         buffer = resp.get('R', '')
         vector_q = buffer
         genai = buffer
-        print("BUFFER: ", buffer)
+        # print("BUFFER: ", buffer)
 
         if isinstance(buffer,list) and len(buffer)==2:
             genai = buffer[0]

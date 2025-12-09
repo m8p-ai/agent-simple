@@ -136,8 +136,8 @@ MAP = {
     'message_notify_user[title]- notificacao de utilizador' : {
         'list': [
             {
-                "title": "Import Success",
-                "message": "The CSV import for Res.Partner finished.",
+                "title": "Utilizador Notificado com sucesso",
+                "message": "O Utilizador foi notificado com sucesso",
                 "sticky": False,
                 "type": "success"
             }
@@ -147,8 +147,8 @@ MAP = {
 
 def execute_tool(name, params=None):
     ## GENERATE: Simple fetcher to return the fixtures based on key
-    if name in MAP:
-        return MAP[name]
+    if name in MAP and 'list' in MAP[name]:
+        return MAP[name]['list']
 
     return []
 
