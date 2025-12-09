@@ -143,6 +143,47 @@ MAP = {
             }
         ]
     },
+    
+    "list_available_models[crm]- modelos relacionados ao crm": {
+        "list": [
+          {
+            "model": "crm.lead",
+            "name": "Lead/Opportunity",
+            "description": "Main object for tracking potential sales and pipeline progression.",
+            "type": "transactional",
+            "count": 142
+          },
+          {
+            "model": "crm.team",
+            "name": "Sales Team",
+            "description": "Organizes users into sales channels (e.g., Direct Sales, Partner Sales).",
+            "type": "configuration",
+            "count": 3
+          },
+          {
+            "model": "crm.stage",
+            "name": "Pipeline Stage",
+            "description": "Defines the steps of the sales funnel (New, Qualified, Won, etc.).",
+            "type": "configuration",
+            "count": 7
+          },
+          {
+            "model": "crm.tag",
+            "name": "CRM Tag",
+            "description": "Labels used to categorize leads (e.g., 'Software', 'Services').",
+            "type": "category",
+            "count": 15
+          },
+          {
+            "model": "crm.lost.reason",
+            "name": "Lost Reason",
+            "description": "Standardized reasons for losing an opportunity (e.g., 'Too Expensive').",
+            "type": "configuration",
+            "count": 8
+          }
+        ]
+    }
+
 }
 
 def execute_tool(name, params=None):
