@@ -222,9 +222,9 @@ async def stream_chat_tests(req: ChatRequest):
                     tool_result = execute_tool(vector_q, params=[])
                     stream_script = f"""
                     stream tool-execute {vector_q} 
-                    stall 0.42 
+                    stall 1.42 
                     stream tool-result {vector_q}##{tool_result} 
-                    stall 0.62
+                    stall 2.62
                     stream tool-finish {vector_q} 
                     """
                 except Exception as e:
