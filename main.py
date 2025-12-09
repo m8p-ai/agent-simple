@@ -193,7 +193,7 @@ async def stream_chat_tests(req: ChatRequest):
     print("RESP: ", resp)
 
     if isinstance(resp, dict) and resp.get('Status') != 'OK':
-        error = resp.get('Error')
+        error = resp.get('Error', '')
         if 'INVALID_REGISTER[<match>]' in error: ## Low certainty abort operation
             stream_script = f"""
             stream Baixa taixa de certeza. Abortando operacao
