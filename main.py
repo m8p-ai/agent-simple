@@ -207,8 +207,6 @@ async def stream_chat_tests(req: ChatRequest):
         vector_q = opx
 
     stream_script = f"""
-    stream {genai}
-    stall 10
     stream {vector_q}
     """
 
