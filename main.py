@@ -204,6 +204,7 @@ async def stream_chat_tests(req: ChatRequest):
         vector_q = buffer
         genai = buffer
         print("BUFFER: ", buffer)
+
         if isinstance(buffer,list) and len(buffer)==2:
             genai = buffer[0]
             opx = buffer[1]
@@ -214,7 +215,10 @@ async def stream_chat_tests(req: ChatRequest):
                 opx = opx.replace(" [ ", "[")
                 opx = opx.replace(" - ", "-")
                 vector_q = opx
+                buffer[1] = vector_q
                 print("vector_q: ", vector_q)
+
+                yield 'data: {"content": "Analyzing '+vector_q+'"}'
 
                 try:
                     tool_result = execute_tool(vector_q, params=[])
