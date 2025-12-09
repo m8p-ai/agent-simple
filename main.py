@@ -192,12 +192,14 @@ async def stream_chat_tests(req: ChatRequest):
         raise HTTPException(status_code=500, detail=f"M8 Error: {resp.get('Err', resp.get('R'))}")
 
     buffer = resp.get('R', '')
-
-    if ' _ ' in buffer and ' [ ' in buffer:
-        buffer = buffer.replace(" _ ", "_")
-        buffer = buffer.replace(" ] ", "]")
-        buffer = buffer.replace(" [ ", "[")
-        buffer = buffer.replace(" - ", "-")
+    if isinstance(buffer,list) and len(buffer)==2:
+        opx = buffer[1]
+        if ' _ ' in opx and ' [ ' in opx:
+            opx = opx.replace(" _ ", "_")
+            opx = opx.replace(" ] ", "]")
+            opx = opx.replace(" [ ", "[")
+            opx = opx.replace(" - ", "-")
+        buffer[1] = opx
 
     return CommandResponse(
         status="success",
