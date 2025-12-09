@@ -221,11 +221,11 @@ async def stream_chat_tests(req: ChatRequest):
                 try:
                     tool_result = execute_tool(vector_q, params=[])
                     stream_script = f"""
-                    stream <<<NL>>>Executando tool {vector_q}
+                    stream Executando tool {vector_q}<<<NL>>>
                     stall 0.22 
-                    stream <<<NL>>>{tool_result}
+                    stream {tool_result}<<<NL>>>
                     stall 0.002
-                    stream <<<NL>>>Terminado
+                    stream Terminado...
                     """
                 except Exception as e:
                     stream_script = f"""
