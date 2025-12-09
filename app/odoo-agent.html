@@ -156,15 +156,10 @@
         <!-- Right Panel: Memory & Indexing -->
         <div class="w-[400px] flex flex-col bg-m8-surface border-l border-m8-border shrink-0">
             <!-- Tabs -->
-            <div class="flex border-b border-m8-border">
-                <button class="flex-1 py-3 text-xs font-mono font-bold text-m8-primary border-b-2 border-m8-primary bg-[#050505]">TOOLS STORE</button>
-                <button class="flex-1 py-3 text-xs font-mono text-m8-dim hover:text-white transition-colors">LOGS</button>
-            </div>
-
             <!-- Vector Store Controls -->
-            <div class="flex-1 overflow-y-auto p-6 space-y-8">
+            <div class="flex-1 overflow-y-auto p-2">
                 <!-- Indexing Section -->
-                <div>
+                <div class="hidden">
                     <h3 class="text-xs font-mono text-white uppercase tracking-widest mb-4 flex items-center gap-2">
                         <i class="fas fa-database text-m8-dim"></i> Index Tool
                     </h3>
@@ -185,22 +180,22 @@
 
                 <!-- Semantic Search Section -->
                 <div class="pt-6 border-t border-m8-border">
-                    <h3 class="text-xs font-mono text-white uppercase tracking-widest mb-4 flex items-center gap-2">
+<!--                     <h3 class="text-xs font-mono text-white uppercase tracking-widest mb-4 flex items-center gap-2">
                         <i class="fas fa-search text-m8-dim"></i> Memory Debug
                     </h3>
-                    <div class="flex gap-2 mb-4">
+ -->                    <div class="flex gap-2 mb-4">
                         <input id="search-query" type="text" 
                             class="flex-1 bg-[#050505] border border-m8-border p-2 text-xs font-mono focus:border-m8-primary focus:outline-none text-white"
-                            placeholder="Search vector space...">
+                            placeholder="Pesquisar apps, integracoes, dicas, ideias, ajuda">
                         <button onclick="searchMemory()" 
                             class="px-4 bg-m8-border hover:bg-white hover:text-black text-white text-xs font-mono transition-colors">
-                            FIND
+                            PESQUISAR
                         </button>
                     </div>
                     
                     <!-- Results Area -->
                     <div id="search-results" class="space-y-2">
-                        <div class="text-[10px] text-m8-dim font-mono text-center py-4 italic">No active search results</div>
+                        <div class="text-[10px] text-m8-dim font-mono text-center py-4 italic">Nenhum resultado encontrado. ainda...</div>
                     </div>
                 </div>
             </div>
