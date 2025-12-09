@@ -208,7 +208,7 @@ async def stream_chat_tests(req: ChatRequest):
 
     stream_script = f"""
     stream {genai}
-    stall 0.0023
+    stall 2
     stream {vector_q}
     """
 
