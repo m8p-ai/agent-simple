@@ -218,8 +218,6 @@ async def stream_chat_tests(req: ChatRequest):
                 buffer[1] = vector_q
                 print("vector_q: ", vector_q)
 
-                yield 'data: {"content": "Analyzing '+vector_q+'"}'
-
                 try:
                     tool_result = execute_tool(vector_q, params=[])
                     stream_script = f"""
