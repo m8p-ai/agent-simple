@@ -172,7 +172,7 @@ async def stream_chat_tests(req: ChatRequest):
     matl2d <curr> <re_response> <r_l2d>
     matcosim <curr> <re_response> <r_cosim>
     store <resp> Question=<q> <<<NL>>> Response = <response> <<<NL>>> l2d=<r_l2d> <<<NL>>> Cosim=<r_cosim> <<<NL>>> Dimension={ODOO_TOOL_EMBED_DIM}
-    store <prompt> <sysp><<<NL>>>Question=<q><<<NL>>>Your answer:
+    store <prompt> <sysp><<<NL>>>Question=<q><<<NL>>>Your answer
     #llm_openai <prompt> instname n_predict=75 temperature=0 force=true stream=false tools=<rtools>
     #llm_instancestatus instname <r3_out>
     ret <prompt> <response>
@@ -192,6 +192,12 @@ async def stream_chat_tests(req: ChatRequest):
         raise HTTPException(status_code=500, detail=f"M8 Error: {resp.get('Err', resp.get('R'))}")
 
     buffer = resp.get('R', '')
+
+    if ' _ ' in buffer and ' [ ' in buffer:
+        buffer = buffer.replace(" _ ", "_")
+        buffer = buffer.replace(" ] ", "]")
+        buffer = buffer.replace(" [ ", "[")
+        buffer = buffer.replace(" - ", "-")
 
     return CommandResponse(
         status="success",
