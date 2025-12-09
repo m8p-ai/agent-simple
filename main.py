@@ -221,15 +221,15 @@ async def stream_chat_tests(req: ChatRequest):
                 try:
                     tool_result = execute_tool(vector_q, params=[])
                     stream_script = f"""
-                    stream Executando tool {vector_q}  <<<NL>>> 
-                    stall 0.22 
-                    stream {tool_result}  <<<NL>>> 
-                    stall 0.002
-                    stream Terminado...
+                    stream tool-execute {vector_q} 
+                    stall 0.42 
+                    stream tool-result {vector_q}##{tool_result} 
+                    stall 0.62
+                    stream tool-finish {vector_q} 
                     """
                 except Exception as e:
                     stream_script = f"""
-                    stream An error ocurred, can you try again
+                    stream tool-error {vector_q}##{str(e)}
                     """
                     print("FAILED TO EXECUTE TOOL: ", e)
 
