@@ -223,7 +223,7 @@ async def stream_chat_tests(req: ChatRequest):
                     stream_script = f"""
                     stream tool-execute {vector_q} 
                     stall 1.42 
-                    stream tool-result {vector_q}##{tool_result} 
+                    stream tool-result {vector_q}##{json.dumps(tool_result)} 
                     stall 2.62
                     stream tool-finish {vector_q} 
                     """
