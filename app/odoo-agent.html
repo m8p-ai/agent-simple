@@ -31,6 +31,37 @@
                 }
             }
         }
+// tailwind.config = {
+//     theme: {
+//         extend: {
+//             fontFamily: {
+//                 sans: ['Inter', 'sans-serif'],
+//                 mono: ['JetBrains Mono', 'monospace'],
+//             },
+//             colors: {
+//                 m8: {
+//                     // --- DARK MODE (Default/Current) ---
+//                     bg: '#050505',
+//                     surface: '#0A0A0C',
+//                     border: '#1F1F23',
+//                     primary: '#FF4D00', // Institutional Orange
+//                     dim: '#71717A',
+//                     text: '#E4E4E7',
+
+//                     // --- LIGHT MODE (New Support) ---
+//                     light: {
+//                         bg: '#FFFFFF',        // Pure White
+//                         surface: '#F8FAFC',   // Very subtle off-white (Slate-50)
+//                         border: '#E2E8F0',    // Light Grey Border (Slate-200)
+//                         primary: '#FF4D00',   // Keep the same Orange branding
+//                         dim: '#64748B',       // Slate-500
+//                         text: '#0F172A'       // Deep Slate/Black for text
+//                     }
+//                 }
+//             }
+//         }
+//     }
+// }
     </script>
 
     <style>
@@ -65,7 +96,8 @@
     <!-- Header -->
     <header class="h-14 border-b border-m8-border bg-[#050505]/95 backdrop-blur flex items-center justify-between px-6 shrink-0 z-50">
         <div class="flex items-center gap-3">
-            <div class="w-6 h-6 bg-m8-primary flex items-center justify-center text-black font-bold font-mono text-xs">M8</div>
+            <!-- <div class="w-6 h-6 bg-m8-primary flex items-center justify-center text-black font-bold font-mono text-xs">M8</div> -->
+            <img src="../assets/odoo.webp" width="25px" />
             <span class="font-mono text-sm tracking-wide text-m8-dim">ODOO EDGE AGENT <span class="text-m8-primary">v1.0</span></span>
         </div>
         <div class="flex items-center gap-4 text-[10px] font-mono">
@@ -87,7 +119,8 @@
             <!-- Chat History -->
             <div id="chat-history" class="flex-1 overflow-y-auto p-6 space-y-6 scroll-smooth">
                 <!-- Welcome Message -->
-                <div class="flex gap-4 max-w-3xl">
+                <div class="flex gap-4 w-100">
+                    <!--
                     <div class="w-8 h-8 rounded-sm bg-m8-surface border border-m8-border flex items-center justify-center shrink-0 text-m8-primary text-xs font-mono">M8</div>
                     <div>
                         <div class="text-xs font-mono text-m8-dim mb-1">SYSTEM</div>
@@ -95,8 +128,8 @@
                             M8P Agent initialized. Session attached. Ready for instructions.
                         </div>
                     </div>
-
-                    <div id="ai-suggestion"></div>
+                    -->
+                    <div id="ai-suggestion" style="width:100%"></div>
                 </div>
             </div>
 
@@ -192,33 +225,69 @@
     <!-- Scripts -->
     <script>
         const API_URL = ""; 
-        // --- EXAMPLE DATA ---
         const suggestions = [
             {
-                title: "Scan Network Leads",
+                title: "Leads e Oportunidades",
                 category: "data",
-                description: "Fetch and analyze latest CRM entries for high probability opportunities.",
-                command: "leads e oportunidades"
+                description: "Analise das leads e das oportunidades",
+                command: "leads e oportunidades",
+                sugs:[
+                    {prompt:"Analise das leads e das oportunidades"},
+                    {prompt:"Busque quantos leads/oportunidades temos."},
+                    {prompt:"Cria um novo lead com nome 'Cliente Mario Silva'."},
+                ],
             },
             {
-                title: "System Diagnostics",
+                title: "CRM",
                 category: "system",
-                description: "Run full check on M8P architecture and connected modules.",
-                command: "execute_odoo_command[diagnostics]"
+                description: "Modulo de CRM (Gestao de Cliente)",
+                command: "execute_odoo_command[diagnostics]",
+                sugs:[
+                    {prompt:"Crie um novo lead no CRM."},
+                    {prompt:"Quais modelos relacionados ao CRM estão disponíveis?"},
+                ],
             },
             {
-                title: "Product Pricing",
+                title: "Inventario & Vendas",
                 category: "data",
-                description: "Retrieve current hardware price list (L40S, H100).",
-                command: "lista de preco produtos"
+                description: "Sistema de Invetario",
+                command: "inventario | produtos | precario",
+                sugs:[
+                    {prompt:"Ordem de venda"},
+                    {prompt:"Pesquise todos os produtos que são armazenáveis "},
+                    {prompt:"Lista de preco dos produtos"},
+                ],
             },
             {
-                title: "Deploy Agent",
+                title: "Inspecao de Objectos",
                 category: "ai",
-                description: "Initialize a new async worker for background processing.",
-                command: "message_notify_user[websocket]"
-            }
+                description: "Inspecao de Objectos",
+                command: "message_notify_user[websocket]",
+                sugs:[
+                    {prompt:"Mostra-me os campos do modelo de leads."},
+                ],
+            },
+            {
+                title: "Notificacao",
+                category: "ai",
+                description: "Notificacao de Utilizadores",
+                command: "message_notify_user[websocket]",
+                sugs:[
+                    {prompt:"notifica o utilizador alex"},
+                ],
+            },
         ];
+
+        window.callPrompt = async function (P) {
+            console.info("P: ", P);
+            const input = document.getElementById('chat-input');
+            input.value = P.text;
+
+            const history = document.getElementById('chat-history');
+            history.scrollTop = history.scrollHeight;
+
+            await sendChat();
+        }
 
         setTimeout(()=>{
             document.getElementById('ai-suggestion').innerHTML = renderPromptCards(suggestions);
@@ -260,10 +329,10 @@
                     align-items: center;
                 ">
                     <span style="color: #ff5722; font-size: 12px; letter-spacing: 1px;">
-                        >> SYSTEM_IDLE // AWAITING_INPUT
+                        BEM VINDO AO ODOO EDGE AGENT
                     </span>
-                    <span style="color: #444; font-size: 10px;">
-                        v2.4.0_STABLE
+                    <span style="color: #fff; font-size: 12px; letter-spacing: 1px;">
+                        Powered By AI Assembly & M8 | v0.0.4
                     </span>
                 </div>
 
@@ -273,11 +342,7 @@
                     gap: 15px;
                 ">
                     <% _.each(items, function(item) { %>
-                        <div 
-                            onclick="window.postMessage({ type: 'insert_prompt', text: '<%= item.command %>' }, '*')"
-                            onmouseover="this.style.borderColor='#ff5722'; this.style.background='#161616';"
-                            onmouseout="this.style.borderColor='#333'; this.style.background='#111';"
-                            style="
+                        <div style="
                                 background-color: #111;
                                 border: 1px solid #333;
                                 padding: 15px;
@@ -292,7 +357,7 @@
                             <div style="margin-bottom: 10px;">
                                 <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
                                     <%= badge(item.category) %>
-                                    <span style="color: #444; font-size: 10px;">::EXEC</span>
+                                    <span style="color: #444; font-size: 10px;"></span>
                                 </div>
                                 <div style="
                                     color: #fff; 
@@ -307,15 +372,19 @@
                                 </div>
                             </div>
 
-                            <div style="
-                                margin-top: 10px;
-                                padding-top: 10px;
-                                border-top: 1px dashed #222;
-                                font-size: 10px;
-                                color: #555;
-                            ">
-                                > <%= item.command %>
-                            </div>
+                            <% _.each(item.sugs, function(S) { %>
+                                <div style="
+                                    margin-top: 5px;
+                                    padding-top: 7px;
+                                    border-top: 1px dashed #222;
+                                    font-size: 10px;
+                                    color: #555;"
+                                    onclick="window.callPrompt({ type: 'insert_prompt', text: '<%= S.prompt %>' }, '*')"
+                                    onmouseover="this.style.borderColor='#ff5722'; this.style.background='#161616';"
+                                    onmouseout="this.style.borderColor='#333'; this.style.background='#111';">
+                                    > <%= S.prompt %>
+                                </div>
+                            <% }) %>
                         </div>
                     <% }); %>
                 </div>
