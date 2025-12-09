@@ -187,13 +187,15 @@ async def stream_chat_tests(req: ChatRequest):
     #llm_openai <input> instname n_predict=78 temperature=0.1 force=true stream=true
     
     resp = M8.RunSession(ODOO_AGENT_SESSION_ID, script, timeout=30)
-    # print("RESP: ", resp)
+    print("RESP: ", resp)
+
     if isinstance(resp, dict) and resp.get('Status') != 'OK':
         raise HTTPException(status_code=500, detail=f"M8 Error: {resp.get('Err', resp.get('R'))}")
 
     buffer = resp.get('R', '')
     vector_q = buffer
     genai = buffer
+    print("BUFFER: ", buffer)
     if isinstance(buffer,list) and len(buffer)==2:
         genai = buffer[0]
         opx = buffer[1]
@@ -203,7 +205,6 @@ async def stream_chat_tests(req: ChatRequest):
             opx = opx.replace(" ] ", "]")
             opx = opx.replace(" [ ", "[")
             opx = opx.replace(" - ", "-")
-        buffer[1] = opx
         vector_q = opx
 
     stream_script = f"""
