@@ -4,8 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>M8P | Agent Command Console</title>
-    <script src="/assets/moment.js"></script>
-    <script src="/assets/underscore.js"></script>
+    <script src="https://m8-site.desktop.farm/assets/moment.js"></script>
+    <script src="https://m8-site.desktop.farm/assets/underscore.js"></script>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
@@ -187,10 +187,122 @@
         </div>
     </div>
 
-    <script src="/assets/app-renderers.js"></script>
     <!-- Scripts -->
     <script>
         const API_URL = ""; 
+
+function renderTerminalTable(data) {
+    if (!data || !Array.isArray(data) || data.length === 0) {
+        return '<div style="font-family: monospace; color: #666; padding: 10px;">> NO_DATA_FOUND</div>';
+    }
+
+    // 1. Extract Headers
+    const headers = Object.keys(data[0]);
+
+    // 2. Formatter Logic (Adapted for Dark Theme)
+    const formatValue = (key, value) => {
+        if (value === null || value === undefined) return '<span style="color: #444;">null</span>';
+
+        // Booleans: Terminal style [YES] / [NO]
+        if (typeof value === 'boolean') {
+            const color = value ? '#00ff41' : '#ff3333'; // Neon Green / Red
+            return `<span style="color:${color}; font-weight:bold;">[${value ? 'TRUE' : 'FALSE'}]</span>`;
+        }
+
+        // Arrays (M2O or Lists)
+        if (Array.isArray(value)) {
+            if (value.length === 2 && typeof value[0] === 'number') {
+                // Link style for Odoo relations
+                return `<span style="color: #ff9f43; text-decoration: underline; cursor: pointer;">${value[1]}</span>`;
+            }
+            return `[${value.join(', ')}]`;
+        }
+
+        // Currency / Numbers
+        if (typeof value === 'number') {
+            const lowerKey = key.toLowerCase();
+            // Check for money fields
+            if (lowerKey.includes('price') || lowerKey.includes('amount') || lowerKey.includes('total')) {
+                return `<span style="color: #2ecc71;">${new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(value)}</span>`;
+            }
+            // Standard numbers
+            return `<span style="color: #3498db;">${value}</span>`;
+        }
+
+        return String(value);
+    };
+
+    // 3. The "M8P" Terminal Template
+    const templateStr = `
+    <div style="
+        font-family: 'Consolas', 'Monaco', 'Courier New', monospace; 
+        background-color: #0d0d0d; 
+        border: 1px solid #333; 
+        color: #e0e0e0;
+        font-size: 13px;
+        margin-top: 10px;
+    ">
+        <div style="
+            background-color: #1a1a1a; 
+            padding: 4px 8px; 
+            border-bottom: 1px solid #333;
+            color: #ff5722; 
+            font-size: 11px;
+            letter-spacing: 1px;
+        ">
+            >> DATA_OUTPUT_STREAM [${data.length}]
+        </div>
+
+        <div style="overflow-x: auto;">
+            <table style="width: 100%; border-collapse: collapse;">
+                <thead>
+                    <tr style="border-bottom: 1px solid #ff5722;"> <% _.each(headers, function(header) { %>
+                            <th style="
+                                text-align: left; 
+                                padding: 8px 12px; 
+                                color: #ff5722; /* Orange Headers */
+                                text-transform: uppercase; 
+                                font-weight: normal;
+                                border-right: 1px solid #222;
+                            ">
+                                <%= header %>
+                            </th>
+                        <% }); %>
+                    </tr>
+                </thead>
+                <tbody>
+                    <% _.each(items, function(row, index) { %>
+                        <tr style="border-bottom: 1px solid #222;">
+                            <% _.each(headers, function(key) { %>
+                                <td style="
+                                    padding: 8px 12px; 
+                                    border-right: 1px solid #222;
+                                    color: #ccc;
+                                ">
+                                    <%= formatter(key, row[key]) %>
+                                </td>
+                            <% }); %>
+                        </tr>
+                    <% }); %>
+                </tbody>
+            </table>
+        </div>
+        <div style="padding: 4px 8px; font-size: 10px; color: #555; text-align: right;">
+            END_OF_STREAM // ${(new Date()).toISOString()}
+        </div>
+    </div>
+    `;
+
+    // 4. Compile
+    if (typeof _ === 'undefined') return "Error: Underscore.js missing";
+    
+    const compiled = _.template(templateStr);
+    return compiled({ 
+        items: data, 
+        headers: headers, 
+        formatter: formatValue 
+    });
+}
 
         function RenderHTML(host, staticHTML) {
           // const host = document.getElementById(idParent);
